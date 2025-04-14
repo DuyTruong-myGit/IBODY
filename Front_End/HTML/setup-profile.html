@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết lập hồ sơ - iBody</title>
+    <link rel="stylesheet" href="../CSS/setup-profile.css">
+</head>
+<body>
+
+    <section class="setup-profile">
+        <h2>Thiết lập hồ sơ cá nhân</h2>
+        <form id="profileForm">
+          <label>Độ tuổi:
+            <input type="number" id="age" name="age" min="10" max="100" required>
+          </label>
+    
+          <label>Giới tính:
+            <select name="gender" required>
+              <option value="">-- Chọn giới tính --</option>
+              <option value="nam">Nam</option>
+              <option value="nu">Nữ</option>
+              <option value="khac">Khác</option>
+            </select>
+          </label>
+    
+          <label>Mục đích sử dụng:</label>
+          <div class="purpose-dropdown">
+            <input type="text" id="purposeInput" name="purpose" placeholder="Chọn mục đích sử dụng" readonly required>
+            <div class="purpose-options" id="purposeOptions">
+              <label>Bắt đầu tìm hiểu về cơ thể mình</label>
+              <label>Bổ sung và mở rộng kiến thức mới</label>
+              <label>Cập nhật phương pháp dạy học,...</label>
+              <label>Vì những lý do khác</label>
+            </div>
+          </div>
+    
+          <label>Họ tên:
+            <input type="text" name="fullname" required>
+          </label>
+    
+          <label>Số điện thoại:
+            <input type="tel" name="phone" required>
+          </label>
+    
+          <div id="guardianInfo" style="display:none;">
+            <label>Họ tên người giám hộ:
+              <input type="text" name="guardianName">
+            </label>
+            <label>Số điện thoại người giám hộ:
+              <input type="tel" name="guardianPhone">
+            </label>
+          </div>
+    
+          <button type="submit">Hoàn tất hồ sơ</button>
+        </form>
+      </section>
+    
+    
+    <script src="../JS/setup-profile.js"></script>
+</body>
+</html>

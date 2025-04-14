@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBODY</title>
+    <link rel="stylesheet" href="../CSS/index.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+          <span class="symbol">♂♀</span>
+          <span class="brand">ibody</span>
+        </div>
+        <nav class="nav">
+          <a href="#" class="active">Trang chủ</a>
+          <a href="#">Về chúng tôi</a>
+          <a href="#">Chương trình</a>
+          <a href="#">Tuyển dụng</a>
+          <a href="#">Liên hệ</a>
+          <a href="#" onclick="openAuthModal()">Đăng nhập</a>
+        </nav>
+      </header>
+    
+      <section class="hero">
+        <div class="hero-content">
+          <img src="https://cdn-icons-png.flaticon.com/512/481/481038.png" alt="Home Icon" class="icon-left">
+          <div class="text-box">
+            <h1>
+              Thấu hiểu <span class="highlight-pink">thân thể bạn</span><br>
+              giảm thiểu những <span class="highlight-blue">vấn nạn</span>
+            </h1>
+            <p>
+              Hãy cùng ibody bảo vệ người dùng trước những nguy cơ xâm hại,<br>
+              tìm hiểu thêm về giáo dục giới tính và nâng cao nhận thức trong cộng đồng bạn nhé!
+            </p>
+            <button>Tìm hiểu thêm</button>
+          </div>
+          <img src="https://cdn-icons-png.flaticon.com/512/8832/8832360.png" alt="Wave Hand" class="icon-right">
+        </div>
+        <div class="badge">Your Body - ibody</div>
+      </section>
+
+          <!-- Nội dung  -->
+          <section class="core-values">
+            <h2>Giá trị cốt lõi của ứng dụng</h2>
+            <div class="core-card">
+              <p><strong>SDS 3 (sức khỏe và có cuộc sống tốt):</strong> bảo vệ người dùng trước nguy cơ bị xâm hại</p>
+              <p><strong>SDG 4 (giáo dục chất lượng):</strong> giáo dục giới tính thiết thực thông qua gamification</p>
+              <p><strong>SDG 5 (bình đẳng giới):</strong> nâng cao nhận thức trong cộng đồng và nuôi dưỡng sự tôn trọng lẫn nhau & hành động đúng đắn</p>
+            </div>
+          </section>
+          <section class="features-section">
+            <h2>Những tính năng<br>của ứng dụng</h2>
+            <div class="features-box">
+              <p><strong>Học tập – rèn luyện – tiếp thu:</strong> mô phỏng 2D cơ thể, khóa học dạng flashcard và hình minh họa, game và bài tập rèn luyện phong phú</p>
+              <p><strong>Tư vấn – Hỗ trợ – Bảo vệ:</strong> Trợ lý AI với lời khuyên khách quan và phù hợp về sức khỏe sinh sản, hỗ trợ người bị lạm dụng, công cụ bảo vệ người bị xâm hại.</p>
+              <p><strong>Khuyến khích – Bổ trợ:</strong> Điểm tích lũy và mã quà hấp dẫn sẽ nhận được khi tích cực tìm hiểu về sức khỏe sinh sản. Hãy nhanh tay đổi lấy phần quà nhé!</p>
+            </div>
+          </section>
+          
+
+          <!-- footer -->
+      <footer class="footer">
+        <div class="footer-container">
+          <div class="footer-about">
+            <h3>Về chúng tôi</h3>
+            <p>
+                IBODY là một dự án nhằm kết nối học sinh với các chuyên gia tâm lý đáng tin cậy, hỗ trợ tư vấn những vấn đề tâm lý, sinh lý và tình dục mà các em còn ngần ngại chia sẻ với phụ huynh.
+                Chúng tôi mang đến không gian an toàn, thông tin chính xác và sự đồng hành chuyên nghiệp để giúp học sinh thấu hiểu bản thân, vượt qua lo lắng và phát triển một cách lành mạnh.
+            </p>
+          </div>
+          <div class="footer-contact">
+            <h4>Liên hệ</h4>
+            <p>Email: duytruongk22@gmail.com</p>
+            <p>Hotline: 0889 225 315</p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 ibody. All rights reserved.</p>
+        </div>
+      </footer>
+
+      
+
+      
+<!-- Auth Modal -->
+<div id="authModal" class="modal-overlay">
+    <div class="auth-modal">
+      <button class="close-btn" onclick="closeAuthModal()">×</button>
+  
+      <div class="form-toggle">
+        <button id="loginToggle" class="active">Đăng nhập</button>
+        <button id="registerToggle">Đăng ký</button>
+      </div>
+  
+      <form id="loginForm" class="form active">
+        <h2>Đăng nhập</h2>
+        <input type="email" placeholder="Email" required />
+        <input type="password" placeholder="Mật khẩu" required />
+        <a href="#" class="forgot-password">Quên mật khẩu?</a>
+        <button type="submit">Đăng nhập</button>
+      </form>
+  
+      <form id="registerForm" class="form">
+        <h2>Đăng ký</h2>
+        <input type="text" placeholder="Họ tên" required />
+        <input type="email" placeholder="Email" required />
+        <input type="password" placeholder="Mật khẩu" required />
+        <input type="password" placeholder="Xác nhận mật khẩu" required />
+        <button type="submit">Tạo tài khoản</button>
+      </form>
+    </div>
+  </div>
+
+      <script src="../JS/index.js"></script>
+</body>
+
+</html>
+
