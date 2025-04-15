@@ -18,7 +18,20 @@
           <a href="#">Chương trình</a>
           <a href="#">Tuyển dụng</a>
           <a href="#">Liên hệ</a>
-          <a href="#" onclick="openAuthModal()">Đăng nhập</a>
+          <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập</a>
+          <div class="user-menu" id="userMenu" style="display: none;">
+            <div class="user-button" onclick="toggleUserDropdown()">
+              <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="avatar">
+              <span id="usernameDisplay"></span>
+            </div>
+            <div class="user-dropdown" id="userDropdown">
+              <a href="profile.html">👤 Trang cá nhân</a>
+              <a href="settings.html">⚙️ Cài đặt & quyền riêng tư</a>
+              <a href="help.html">❓ Trợ giúp & hỗ trợ</a>
+              <a href="#" onclick="logout()">🚪 Đăng xuất</a>
+            </div>
+          </div>
+          
         </nav>
       </header>
     
@@ -96,18 +109,18 @@
   
       <form id="loginForm" class="form active">
         <h2>Đăng nhập</h2>
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Mật khẩu" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Mật khẩu" required />
         <a href="#" class="forgot-password">Quên mật khẩu?</a>
         <button type="submit">Đăng nhập</button>
       </form>
-  
+
       <form id="registerForm" class="form">
         <h2>Đăng ký</h2>
-        <input type="text" placeholder="Họ tên" required />
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Mật khẩu" required />
-        <input type="password" placeholder="Xác nhận mật khẩu" required />
+        <input type="text" name="fullName" placeholder="Họ tên" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Mật khẩu" required />
+        <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu" required />
         <button type="submit">Tạo tài khoản</button>
       </form>
     </div>

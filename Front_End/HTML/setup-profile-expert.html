@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Hồ sơ chuyên gia - IBODY</title>
+  <link rel="stylesheet" href="../CSS/setup-profile.css">
+</head>
+<body>
+  <section class="setup-profile">
+    <h2>Thiết lập hồ sơ chuyên gia</h2>
+    <form id="expertForm" enctype="multipart/form-data">
+      <label>Độ tuổi:
+        <input type="number" name="age" min="18" max="100" required>
+      </label>
+
+      <label>Giới tính:
+        <select name="gender" required>
+          <option value="">-- Chọn giới tính --</option>
+          <option value="nam">Nam</option>
+          <option value="nu">Nữ</option>
+          <option value="khac">Khác</option>
+        </select>
+      </label>
+
+      <label>Mục đích tư vấn:
+        <textarea name="purpose" rows="3" placeholder="Mô tả lĩnh vực bạn có thể tư vấn" required></textarea>
+      </label>
+
+      <label>Họ tên:
+        <input type="text" name="fullname" required>
+      </label>
+
+      <label>Số điện thoại:
+        <input type="tel" name="phone" required>
+      </label>
+
+      <label>Giấy tờ chứng thực chuyên môn (ảnh hoặc file):
+        <input type="file" name="verification" accept="image/*,.pdf" required>
+      </label>
+
+      <button type="submit">Gửi hồ sơ chuyên gia</button>
+    </form>
+  </section>
+
+<script src="../JS/setup-profile-expert.js"></script>
+</body>
+</html>
