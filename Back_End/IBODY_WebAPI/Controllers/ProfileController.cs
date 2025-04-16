@@ -21,7 +21,6 @@ namespace IBODY_WebAPI.Controllers
         [HttpPost("client")]
         public async Task<IActionResult> SubmitClientProfile([FromBody] ClientProfileDto dto)
         {
-            // Kiểm tra tồn tại user
             var user = await _context.Users.FindAsync(dto.UserId);
             if (user == null) return NotFound(new { message = "User không tồn tại." });
 
@@ -49,7 +48,6 @@ namespace IBODY_WebAPI.Controllers
             var user = await _context.Users.FindAsync(dto.UserId);
             if (user == null) return NotFound(new { message = "User không tồn tại." });
 
-            // Xử lý file ảnh/giấy tờ
             var uploadsDir = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads", "verification");
             Directory.CreateDirectory(uploadsDir);
 
@@ -68,7 +66,8 @@ namespace IBODY_WebAPI.Controllers
                 Gender = dto.Gender,
                 Purpose = dto.Purpose,
                 VerificationImage = fileName,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                IsApproved = false // mặc định là chưa duyệt
             };
 
             _context.ExpertProfiles.Add(profile);
@@ -78,7 +77,6 @@ namespace IBODY_WebAPI.Controllers
         }
     }
 
-    // DTOs
     public class ClientProfileDto
     {
         public int UserId { get; set; }

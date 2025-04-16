@@ -66,6 +66,7 @@ registerForm.addEventListener("submit", async (event) => {
 
     const result = await response.json();
     if (response.ok) {
+      localStorage.setItem("user", JSON.stringify(result.user));
       alert("Đăng ký thành công! Vui lòng tiếp tục hoàn tất hồ sơ.");
       closeAuthModal();
       window.location.href = "../HTML/setup-choose-role.html";

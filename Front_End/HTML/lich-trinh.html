@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Lịch trình của bạn - iBody</title>
+  <link rel="stylesheet" href="../CSS/index.css">
+  <link rel="stylesheet" href="../CSS/lich-trinh.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <span class="symbol">♂♀</span>
+      <span class="brand">ibody</span>
+    </div>
+    <nav class="nav">
+      <a href="Index.html">Trang chủ</a>
+      <a href="#">Khóa Học</a>
+      <a href="#">Game</a>
+      <a href="lich-trinh.html" class="active">Lịch Trình</a>
+      <a href="#">Cộng Đồng</a>
+      <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập</a>
+      <div class="user-menu" id="userMenu" style="display: none;">
+        <div class="user-button" onclick="toggleUserDropdown()">
+          <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="avatar">
+          <span id="usernameDisplay"></span>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="profile.html">👤 Trang cá nhân</a>
+          <a href="settings.html">⚙️ Cài đặt</a>
+          <a href="help.html">❓ Trợ giúp</a>
+          <a href="#" onclick="logout()">🚪 Đăng xuất</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Phần nội dung lịch trình -->
+  <main class="lichtrinh-container">
+    <section class="lichtrinh-top">
+      <h2>Hôm nay bạn cảm thấy thế nào?</h2>
+      <div class="lichtrinh-actions">
+        <button onclick="window.location.href='setup-profile.html'">🩺 Hồ sơ sức khỏe</button>
+        <button onclick="window.location.href='./tu-van.html'">💬 Tư vấn</button>
+      </div>
+    </section>
+
+    <section class="lichtrinh-list">
+      <div class="lichtrinh-header">
+        <h3>Lịch trình của bạn</h3>
+        <a href="#">Tất cả →</a>
+      </div>
+
+      <div class="lichtrinh-cards">
+        <!-- Lịch trình mẫu A -->
+        <div class="lichtrinh-card">
+          <h4>📅 Lịch trình A</h4>
+          <p>Đây là 1 ví dụ về lịch trình A</p>
+          <span>Giờ hẹn: 13:00</span>
+        </div>
+
+        <!-- Lịch trình mẫu B -->
+        <div class="lichtrinh-card">
+          <h4>📅 Lịch trình B</h4>
+          <p>Đây là 1 ví dụ về lịch trình B</p>
+          <span>Giờ hẹn: 15:30</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-about">
+        <h3>Về chúng tôi</h3>
+        <p>
+          IBODY là một dự án nhằm kết nối học sinh với chuyên gia tâm lý đáng tin cậy.
+        </p>
+      </div>
+      <div class="footer-contact">
+        <h4>Liên hệ</h4>
+        <p>Email: duytruongk22@gmail.com</p>
+        <p>Hotline: 0889 225 315</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 ibody. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="../JS/index.js"></script>
+</body>
+</html>

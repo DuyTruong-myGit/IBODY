@@ -15,7 +15,6 @@ namespace IBODY_WebAPI.Controllers
             _context = context;
         }
 
-        // ✅ Lấy toàn bộ người dùng (kể cả chuyên gia)
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -23,7 +22,6 @@ namespace IBODY_WebAPI.Controllers
             return Ok(users);
         }
 
-        // ✅ Xoá tài khoản người dùng (soft delete nếu cần)
         [HttpDelete("user/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -36,19 +34,17 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { message = "Xoá người dùng thành công" });
         }
 
-        // ✅ Danh sách chuyên gia chờ duyệt
         [HttpGet("experts/pending")]
         public async Task<IActionResult> GetPendingExperts()
         {
             var pending = await _context.ExpertProfiles
                 .Include(x => x.User)
-                .Where(x => x.IsApproved == false)
+                .Where(x => !x.IsApproved)
                 .ToListAsync();
 
             return Ok(pending);
         }
 
-        // ✅ Phê duyệt hồ sơ chuyên gia
         [HttpPost("experts/approve/{profileId}")]
         public async Task<IActionResult> ApproveExpert(int profileId)
         {
@@ -61,7 +57,6 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { message = "Đã duyệt hồ sơ chuyên gia." });
         }
 
-        // ✅ Từ chối (xoá) hồ sơ chuyên gia
         [HttpDelete("experts/reject/{profileId}")]
         public async Task<IActionResult> RejectExpert(int profileId)
         {
