@@ -1,98 +1,56 @@
-using IBODY_WebAPI.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using IBODY_WebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace IBODY_WebAPI.Controllers
+namespace IBODY_WebAPI.Controllers;
+[ApiController]
+[Route("api/profile")]
+public class ProfileController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProfileController : ControllerBase
+    private readonly FinalIbodyContext _context;
+
+    public ProfileController(FinalIbodyContext context)
     {
-        private readonly IbodyContext _context;
-        private readonly IWebHostEnvironment _env;
-
-        public ProfileController(IbodyContext context, IWebHostEnvironment env)
-        {
-            _context = context;
-            _env = env;
-        }
-
-        // POST: api/Profile/client
-        [HttpPost("client")]
-        public async Task<IActionResult> SubmitClientProfile([FromBody] ClientProfileDto dto)
-        {
-            var user = await _context.Users.FindAsync(dto.UserId);
-            if (user == null) return NotFound(new { message = "User không tồn tại." });
-
-            var profile = new ClientProfile
-            {
-                UserId = dto.UserId,
-                Age = dto.Age,
-                Gender = dto.Gender,
-                Purpose = dto.Purpose,
-                GuardianName = dto.GuardianName,
-                GuardianPhone = dto.GuardianPhone,
-                CreatedAt = DateTime.Now
-            };
-
-            _context.ClientProfiles.Add(profile);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Hồ sơ khách hàng đã lưu thành công." });
-        }
-
-        // POST: api/Profile/expert
-        [HttpPost("expert")]
-        public async Task<IActionResult> SubmitExpertProfile([FromForm] ExpertProfileDto dto)
-        {
-            var user = await _context.Users.FindAsync(dto.UserId);
-            if (user == null) return NotFound(new { message = "User không tồn tại." });
-
-            var uploadsDir = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads", "verification");
-            Directory.CreateDirectory(uploadsDir);
-
-            var fileName = $"{Guid.NewGuid()}_{dto.VerificationFile.FileName}";
-            var filePath = Path.Combine(uploadsDir, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.VerificationFile.CopyToAsync(stream);
-            }
-
-            var profile = new ExpertProfile
-            {
-                UserId = dto.UserId,
-                Age = dto.Age,
-                Gender = dto.Gender,
-                Purpose = dto.Purpose,
-                VerificationImage = fileName,
-                CreatedAt = DateTime.Now,
-                IsApproved = false // mặc định là chưa duyệt
-            };
-
-            _context.ExpertProfiles.Add(profile);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Hồ sơ chuyên gia đã lưu thành công." });
-        }
+        _context = context;
     }
 
-    public class ClientProfileDto
+    [HttpPost("request-upgrade")]
+    public async Task<IActionResult> RequestUpgradeToExpert([FromBody] ExpertUpgradeDto dto)
     {
-        public int UserId { get; set; }
-        public int Age { get; set; }
-        public string Gender { get; set; } = null!;
-        public string Purpose { get; set; } = null!;
-        public string? GuardianName { get; set; }
-        public string? GuardianPhone { get; set; }
-    }
+        // Kiểm tra tài khoản có tồn tại không
+        var user = await _context.TaiKhoans.FindAsync(dto.TaiKhoanId);
+        if (user == null)
+            return NotFound(new { message = "Không tìm thấy tài khoản." });
 
-    public class ExpertProfileDto
-    {
-        public int UserId { get; set; }
-        public int Age { get; set; }
-        public string Gender { get; set; } = null!;
-        public string Purpose { get; set; } = null!;
-        public IFormFile VerificationFile { get; set; } = null!;
+        // Kiểm tra nếu đã gửi yêu cầu rồi
+        if (await _context.ChuyenGia.AnyAsync(x => x.TaiKhoanId == dto.TaiKhoanId))
+            return BadRequest(new { message = "Bạn đã gửi yêu cầu trước đó." });
+
+        var expert = new ChuyenGium
+        {
+            TaiKhoanId = dto.TaiKhoanId,
+            HoTen = dto.HoTen,
+            SoNamKinhNghiem = dto.SoNamKinhNghiem,
+            SoChungChi = dto.SoChungChi,
+            ChuyenMon = dto.ChuyenMon,
+            GioiThieu = dto.GioiThieu,
+            TrangThai = "cho_duyet"
+        };
+
+        _context.ChuyenGia.Add(expert);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Đã gửi yêu cầu nâng cấp. Vui lòng chờ xác nhận từ admin." });
     }
+}
+
+public class ExpertUpgradeDto
+{
+    public int TaiKhoanId { get; set; }
+    public string HoTen { get; set; } = null!;
+    public int SoNamKinhNghiem { get; set; }
+    public string SoChungChi { get; set; } = null!;
+    public string ChuyenMon { get; set; } = null!;
+    public string GioiThieu { get; set; } = null!;
 }

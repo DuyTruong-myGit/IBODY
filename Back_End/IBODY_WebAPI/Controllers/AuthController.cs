@@ -1,83 +1,89 @@
-using IBODY_WebAPI.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BCrypt.Net;
+using IBODY_WebAPI.Models;
 
 namespace IBODY_WebAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly IbodyContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthController(IbodyContext context)
+        public AuthController(UserManager<ApplicationUser> userManager,
+                              SignInManager<ApplicationUser> signInManager,
+                              RoleManager<IdentityRole> roleManager)
         {
-            _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
-        // POST: api/Auth/register
+        // ✅ Đăng ký
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterDto request)
+        public async Task<IActionResult> Register(RegisterDto dto)
         {
-            if (await _context.Users.AnyAsync(u => u.Username == request.Username))
+            var user = new ApplicationUser
             {
-                return BadRequest(new { message = "Tên đăng nhập đã tồn tại." });
-            }
-
-            var user = new User
-            {
-                Username = request.Username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                FullName = request.FullName,
-                Email = request.Email,
-                CreatedAt = DateTime.Now
+                UserName = dto.Email,
+                Email = dto.Email,
+                FullName = dto.FullName,
+                Gender = dto.Gender,
+                Dob = dto.Dob
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
 
-            return Ok(new { message = "Đăng ký thành công!" });
+            // Gán mặc định vai trò người dùng
+            if (!await _roleManager.RoleExistsAsync("nguoi_dung"))
+                await _roleManager.CreateAsync(new IdentityRole("nguoi_dung"));
+
+            await _userManager.AddToRoleAsync(user, "nguoi_dung");
+
+            return Ok("Đăng ký thành công");
         }
 
-        // POST: api/Auth/login
+        // ✅ Đăng nhập
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserLoginDto request)
+        public async Task<IActionResult> Login(LoginDto dto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null) return Unauthorized("Không tìm thấy tài khoản");
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            {
-                return Unauthorized(new { message = "Tên đăng nhập hoặc mật khẩu không đúng." });
-            }
+            var result = await _signInManager.PasswordSignInAsync(user, dto.Password, true, false);
+            if (!result.Succeeded) return Unauthorized("Sai mật khẩu");
+
+            var roles = await _userManager.GetRolesAsync(user);
 
             return Ok(new
             {
-                message = "Đăng nhập thành công!",
+                message = "Đăng nhập thành công",
                 user = new
                 {
-                    user.Id,
-                    user.Username,
-                    user.FullName,
                     user.Email,
-                    user.CreatedAt
+                    user.FullName,
+                    roles = roles
                 }
             });
         }
     }
 
-    // DTOs
-    public class UserRegisterDto
+    public class RegisterDto
     {
-        public string Username { get; set; } = null!;
+        public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
         public string? FullName { get; set; }
-        public string? Email { get; set; }
+        public string? Gender { get; set; }
+        public DateOnly? Dob { get; set; }
     }
 
-    public class UserLoginDto
+    public class LoginDto
     {
-        public string Username { get; set; } = null!;
+        public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
     }
 }

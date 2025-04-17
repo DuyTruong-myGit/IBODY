@@ -1,13 +1,27 @@
 using IBODY_WebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using IBODY_WebAPI.Data;
+using Microsoft.AspNetCore.Identity;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ✅ Add DbContext using SQL Server (Database First)
-builder.Services.AddDbContext<IbodyContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/api/auth/login";
+    options.AccessDeniedPath = "/api/auth/denied";
+});
+
+
+ builder.Services.AddDbContext<FinalIbodyContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ✅ Add CORS (cho phép frontend truy cập API)
 builder.Services.AddCors(options =>
