@@ -15,10 +15,14 @@ namespace IBODY_WebAPI.Controllers
             _context = context;
         }
 
-        // ✅ Lịch hẹn dành cho chuyên gia đang đăng nhập
+        //Lịch hẹn dành cho chuyên gia đang đăng nhập
         [HttpGet("chuyen-gia/{chuyenGiaId}")]
-        public async Task<IActionResult> GetLichHenChuyenGia(int chuyenGiaId)
+        public async Task<IActionResult> GetLichHenChuyenGia(int chuyenGiaId,[FromQuery] int taiKhoanId)
         {
+            var tk = await _context.TaiKhoans.FindAsync(taiKhoanId);
+            if (tk == null || tk.TrangThai == "khoa")
+                return Forbid("Tài khoản của bạn đã bị khóa.");
+            
             var lich = await _context.LichHens
                 .Where(lh => lh.ChuyenGiaId == chuyenGiaId)
                 .Include(lh => lh.NguoiDung)
@@ -44,8 +48,12 @@ namespace IBODY_WebAPI.Controllers
 
 
         [HttpDelete("huy-lich-chuyen-gia/{lichHenId}")]
-        public async Task<IActionResult> HuyLichHenChuyenGia(int lichHenId)
+        public async Task<IActionResult> HuyLichHenChuyenGia(int lichHenId,[FromQuery] int taiKhoanId)
         {
+            var tk = await _context.TaiKhoans.FindAsync(taiKhoanId);
+            if (tk == null || tk.TrangThai == "khoa")
+                return Forbid("Tài khoản của bạn đã bị khóa.");
+                
             var lich = await _context.LichHens.FindAsync(lichHenId);
             if (lich == null)
                 return NotFound(new { message = "Lịch hẹn không tồn tại." });

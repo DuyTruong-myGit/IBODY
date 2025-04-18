@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IBODY_WebAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c56d93ab1243ff980e6a9992d05c52d69626aa2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a71eddadb1373e502f60427998b91bbdd2a96101")]
 [assembly: System.Reflection.AssemblyProductAttribute("IBODY_WebAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IBODY_WebAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

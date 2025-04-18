@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using IBODY_WebAPI.Models;
 
@@ -8,17 +9,20 @@ namespace IBODY_WebAPI.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
+        private readonly FinalIbodyContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public AuthController(UserManager<ApplicationUser> userManager,
                               SignInManager<ApplicationUser> signInManager,
-                              RoleManager<IdentityRole> roleManager)
+                              RoleManager<IdentityRole> roleManager,
+                              FinalIbodyContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
         // ✅ Đăng ký
@@ -59,6 +63,8 @@ namespace IBODY_WebAPI.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            var taiKhoan = await _context.TaiKhoans
+                .FirstOrDefaultAsync(tk => tk.Email == user.Email);
             return Ok(new
             {
                 message = "Đăng nhập thành công",
@@ -66,7 +72,10 @@ namespace IBODY_WebAPI.Controllers
                 {
                     user.Email,
                     user.FullName,
-                    roles = roles
+                    roles = roles,
+                    taiKhoanId = user.Id,
+                    trangThai = taiKhoan?.TrangThai
+
                 }
             });
         }

@@ -58,6 +58,10 @@ namespace IBODY_WebAPI.Controllers
             if (expert == null)
                 return NotFound(new { message = "Không tìm thấy chuyên gia." });
 
+            var tk = await _context.TaiKhoans.FindAsync(expert.TaiKhoanId);
+            if (tk == null || tk.TrangThai == "khoa")
+                return Forbid("Tài khoản của bạn đã bị khóa.");
+
             // Lấy đánh giá (nếu có)
             var danhGias = await _context.DanhGia
                 .Where(dg => dg.ChuyenGiaId == id)

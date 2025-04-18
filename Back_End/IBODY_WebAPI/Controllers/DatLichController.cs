@@ -59,8 +59,10 @@ namespace IBODY_WebAPI.Controllers
 
             _context.LichHens.Add(lichHen);
             await _context.SaveChangesAsync();
+            
+            var hinhThuc = await _context.HinhThucTuVans.FindAsync(dto.HinhThucId);
 
-            return Ok(new { message = "Đặt lịch thành công!" });
+            return Ok(new { message = "Đặt lịch thành công!" , tongTien = hinhThuc?.GiaCoBan ?? 0});
         }
 
 

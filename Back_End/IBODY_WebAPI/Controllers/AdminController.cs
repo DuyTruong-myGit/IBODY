@@ -124,6 +124,122 @@ namespace IBODY_WebAPI.Controllers
         return Ok(new { message = "Đã từ chối yêu cầu nâng cấp." });
         }
 
+        // hiển thị toàn bộ lịch hẹn đang có trên hệ thống
+        [HttpGet("lich-hen")]
+        public async Task<IActionResult> GetAllLichHen()
+        {
+            var lich = await _context.LichHens
+                .Include(lh => lh.NguoiDung)
+                .Include(lh => lh.ChuyenGia)
+                .Include(lh => lh.HinhThuc)
+                .Select(lh => new
+                {
+                    lh.Id,
+                    lh.ThoiGianBatDau,
+                    lh.ThoiGianKetThuc,
+                    lh.TomTat,
+                    NguoiDung = new
+                    {
+                        lh.NguoiDung.Id,
+                        lh.NguoiDung.HoTen
+                    },
+                    ChuyenGia = new
+                    {
+                        lh.ChuyenGia.Id,
+                        lh.ChuyenGia.HoTen,
+                        lh.ChuyenGia.ChuyenMon
+                    },
+                    HinhThuc = lh.HinhThuc.Ten
+                })
+                .OrderByDescending(lh => lh.ThoiGianBatDau)
+                .ToListAsync();
+
+            return Ok(lich);
+        }
+
+        // Cập nhật lịch hẹn trên hệ thống
+        [HttpPut("lich-hen/{id}")]
+        public async Task<IActionResult> UpdateLichHen(int id, [FromBody] UpdateLichHenDto dto)
+        {
+            var lich = await _context.LichHens.FindAsync(id);
+            if (lich == null)
+                return NotFound(new { message = "Không tìm thấy lịch hẹn." });
+
+            lich.ThoiGianBatDau = dto.ThoiGianBatDau;
+            lich.ThoiGianKetThuc = dto.ThoiGianKetThuc;
+            lich.TomTat = dto.TomTat;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Cập nhật lịch hẹn thành công." });
+        }
+
+
+
+        // Xóa lịch hẹn trên hệ thống
+        [HttpDelete("lich-hen/{id}")]
+        public async Task<IActionResult> DeleteLichHen(int id)
+        {
+            var lich = await _context.LichHens.FindAsync(id);
+            if (lich == null)
+                return NotFound(new { message = "Không tìm thấy lịch hẹn." });
+
+            _context.LichHens.Remove(lich);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã xóa lịch hẹn thành công." });
+        }
+
+        // Hiển thị danh sách báo cáo vi phạm của người dùng
+        [HttpGet("bao-cao")]
+        public async Task<IActionResult> GetBaoCaoViPham()
+        {
+            var danhSach = await _context.BaoCaoViPhams
+                .Where(bc => bc.LoaiDoiTuong == "nguoi_dung")
+                .Select(bc => new
+                {
+                    bc.Id,
+                    bc.NguoiBaoCaoId,
+                    DoiTuongId = bc.DoiTuongId,
+                    bc.LyDo,
+                    bc.ThoiGian,
+                    EmailNguoiBiBaoCao = _context.TaiKhoans
+                        .Where(tk => tk.Id == bc.DoiTuongId)
+                        .Select(tk => tk.Email)
+                        .FirstOrDefault()
+                })
+                .OrderByDescending(bc => bc.ThoiGian)
+                .ToListAsync();
+
+            return Ok(danhSach);
+        }
+        // khóa tài khoản chuyên gia
+        [HttpPost("khoa-tai-khoan/{id}")]
+        public async Task<IActionResult> KhoaTaiKhoan(int id)
+        {
+            var tk = await _context.TaiKhoans.FindAsync(id);
+            if (tk == null)
+                return NotFound(new { message = "Không tìm thấy tài khoản." });
+
+            tk.TrangThai = "khoa";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã khóa tài khoản chuyên gia." });
+        }
+        // mở khóa tài khoản chuyên gia
+        [HttpPost("mo-khoa-tai-khoan/{id}")]
+        public async Task<IActionResult> MoKhoaTaiKhoan(int id)
+        {
+            var tk = await _context.TaiKhoans.FindAsync(id);
+            if (tk == null)
+                return NotFound(new { message = "Không tìm thấy tài khoản." });
+
+            if (tk.TrangThai != "khoa")
+                return BadRequest(new { message = "Tài khoản không bị khóa." });
+
+            tk.TrangThai = "hoat_dong";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã mở khóa tài khoản thành công." });
+        }
 
 
 
@@ -137,6 +253,12 @@ namespace IBODY_WebAPI.Controllers
         public string TrangThai { get; set; } = null!;
     }
 
+    public class UpdateLichHenDto
+    {
+        public DateTime ThoiGianBatDau { get; set; }
+        public DateTime ThoiGianKetThuc { get; set; }
+        public string? TomTat { get; set; }
+    }
 
     
 }
