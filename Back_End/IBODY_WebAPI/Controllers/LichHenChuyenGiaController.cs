@@ -54,6 +54,9 @@ namespace IBODY_WebAPI.Controllers
             if (tk == null || tk.TrangThai == "khoa")
                 return Forbid("Tài khoản của bạn đã bị khóa.");
                 
+            var danhGiaLienQuan = _context.DanhGia.Where(dg => dg.LichHenId == lichHenId);
+            _context.DanhGia.RemoveRange(danhGiaLienQuan); // phải xóa đánh giá trước vì nó có khóa ngoại với lịch hẹn
+            
             var lich = await _context.LichHens.FindAsync(lichHenId);
             if (lich == null)
                 return NotFound(new { message = "Lịch hẹn không tồn tại." });

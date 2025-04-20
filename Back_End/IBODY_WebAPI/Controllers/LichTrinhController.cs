@@ -46,6 +46,10 @@ namespace IBODY_WebAPI.Controllers
         [HttpDelete("huy-lich/{lichHenId}")]
         public async Task<IActionResult> HuyLichHen(int lichHenId)
         {
+
+            var danhGiaLienQuan = _context.DanhGia.Where(dg => dg.LichHenId == lichHenId);
+            _context.DanhGia.RemoveRange(danhGiaLienQuan); // phải xóa đánh giá trước vì nó có khóa ngoại với lịch hẹn
+
             var lich = await _context.LichHens.FindAsync(lichHenId);
             if (lich == null)
                 return NotFound(new { message = "Lịch hẹn không tồn tại." });

@@ -54,7 +54,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors();
-// ✅ Add Authorization if using JWT in tương lai
+
 // app.UseAuthentication();
 // app.UseAuthorization();
 

@@ -6,6 +6,7 @@ using IBODY_WebAPI.Data;
 
 namespace IBODY_WebAPI.Controllers
 {
+    //[AllowAnonymous]
     [Authorize(Roles = "quan_tri")]
     [ApiController]
     [Route("api/admin")]
@@ -241,7 +242,72 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { message = "Đã mở khóa tài khoản thành công." });
         }
 
+        // Lấy danh sách tất cả phương thức thanh toán hệ thống
+        [HttpGet("he-thong")]
+        public async Task<IActionResult> GetAllSystemMethods()
+        {
+            var list = await _context.PhuongThucChungs
+                .OrderBy(p => p.Id)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Ten,
+                    p.MoTa,
+                    p.TrangThai
+                })
+                .ToListAsync();
 
+            return Ok(list);
+        }
+
+        //  Thêm phương thức mới
+        [HttpPost("themThanhToan")]
+        public async Task<IActionResult> AddSystemMethod([FromBody] ThemPhuongThucDto dto)
+        {
+            if (await _context.PhuongThucChungs.AnyAsync(p => p.Ten == dto.Ten))
+                return BadRequest(new { message = "Phương thức đã tồn tại." });
+
+            var newMethod = new PhuongThucChung
+            {
+                Ten = dto.Ten,
+                MoTa = dto.MoTa,
+                TrangThai = dto.TrangThai ?? "hien"
+            };
+
+            _context.PhuongThucChungs.Add(newMethod);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã thêm phương thức mới." });
+        }
+
+        //  Cập nhật phương thức
+        [HttpPut("cap-nhat/{id}")]
+        public async Task<IActionResult> UpdateSystemMethod(int id, [FromBody] ThemPhuongThucDto dto)
+        {
+            var pt = await _context.PhuongThucChungs.FindAsync(id);
+            if (pt == null)
+                return NotFound(new { message = "Không tìm thấy phương thức." });
+
+            pt.Ten = dto.Ten;
+            pt.MoTa = dto.MoTa;
+            pt.TrangThai = dto.TrangThai ?? pt.TrangThai;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã cập nhật phương thức." });
+        }
+
+        //Xóa phương thức
+        [HttpDelete("xoa/{id}")]
+        public async Task<IActionResult> DeleteSystemMethod(int id)
+        {
+            var pt = await _context.PhuongThucChungs.FindAsync(id);
+            if (pt == null)
+                return NotFound(new { message = "Không tìm thấy phương thức." });
+
+            _context.PhuongThucChungs.Remove(pt);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã xóa phương thức thành công." });
+        }
 
     }
 
@@ -259,6 +325,11 @@ namespace IBODY_WebAPI.Controllers
         public DateTime ThoiGianKetThuc { get; set; }
         public string? TomTat { get; set; }
     }
-
+        public class ThemPhuongThucDto
+    {
+        public string Ten { get; set; } = null!;
+        public string? MoTa { get; set; }
+        public string? TrangThai { get; set; } 
+    }
     
 }

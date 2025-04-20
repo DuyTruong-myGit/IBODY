@@ -15,6 +15,18 @@ public partial class FinalIbodyContext : DbContext
     {
     }
 
+    public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
+
+    public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
+
+    public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
+
+    public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
+
+    public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
+
+    public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
+
     public virtual DbSet<BaoCaoViPham> BaoCaoViPhams { get; set; }
 
     public virtual DbSet<BinhLuan> BinhLuans { get; set; }
@@ -37,6 +49,10 @@ public partial class FinalIbodyContext : DbContext
 
     public virtual DbSet<NguoiDung> NguoiDungs { get; set; }
 
+    public virtual DbSet<PhuongThucChung> PhuongThucChungs { get; set; }
+
+    public virtual DbSet<PhuongThucNguoiDung> PhuongThucNguoiDungs { get; set; }
+
     public virtual DbSet<PhuongThucThanhToan> PhuongThucThanhToans { get; set; }
 
     public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
@@ -57,6 +73,72 @@ public partial class FinalIbodyContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AspNetRole>(entity =>
+        {
+            entity.HasIndex(e => e.NormalizedName, "RoleNameIndex")
+                .IsUnique()
+                .HasFilter("([NormalizedName] IS NOT NULL)");
+
+            entity.Property(e => e.Name).HasMaxLength(256);
+            entity.Property(e => e.NormalizedName).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<AspNetRoleClaim>(entity =>
+        {
+            entity.HasIndex(e => e.RoleId, "IX_AspNetRoleClaims_RoleId");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.AspNetRoleClaims).HasForeignKey(d => d.RoleId);
+        });
+
+        modelBuilder.Entity<AspNetUser>(entity =>
+        {
+            entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
+
+            entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex")
+                .IsUnique()
+                .HasFilter("([NormalizedUserName] IS NOT NULL)");
+
+            entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+            entity.Property(e => e.UserName).HasMaxLength(256);
+
+            entity.HasMany(d => d.Roles).WithMany(p => p.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "AspNetUserRole",
+                    r => r.HasOne<AspNetRole>().WithMany().HasForeignKey("RoleId"),
+                    l => l.HasOne<AspNetUser>().WithMany().HasForeignKey("UserId"),
+                    j =>
+                    {
+                        j.HasKey("UserId", "RoleId");
+                        j.ToTable("AspNetUserRoles");
+                        j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
+                    });
+        });
+
+        modelBuilder.Entity<AspNetUserClaim>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_AspNetUserClaims_UserId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserClaims).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<AspNetUserLogin>(entity =>
+        {
+            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+
+            entity.HasIndex(e => e.UserId, "IX_AspNetUserLogins_UserId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserLogins).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<AspNetUserToken>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+
+            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
+        });
+
         modelBuilder.Entity<BaoCaoViPham>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__bao_cao___3213E83F7FD0945C");
@@ -320,6 +402,59 @@ public partial class FinalIbodyContext : DbContext
             entity.HasOne(d => d.TaiKhoan).WithMany(p => p.NguoiDungs)
                 .HasForeignKey(d => d.TaiKhoanId)
                 .HasConstraintName("FK__nguoi_dun__tai_k__3C69FB99");
+        });
+
+        modelBuilder.Entity<PhuongThucChung>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__phuong_t__3213E83F17F69BD4");
+
+            entity.ToTable("phuong_thuc_chung");
+
+            entity.HasIndex(e => e.Ten, "UQ__phuong_t__DC107AB1F0C16E62").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.MoTa).HasColumnName("mo_ta");
+            entity.Property(e => e.Ten)
+                .HasMaxLength(50)
+                .HasColumnName("ten");
+            entity.Property(e => e.TrangThai)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("hien")
+                .HasColumnName("trang_thai");
+        });
+
+        modelBuilder.Entity<PhuongThucNguoiDung>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__phuong_t__3213E83FD1E8162F");
+
+            entity.ToTable("phuong_thuc_nguoi_dung");
+
+            entity.HasIndex(e => new { e.TaiKhoanId, e.PhuongThucId }, "UQ__phuong_t__FFAAD5A0994770B4").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ChiTiet)
+                .HasMaxLength(255)
+                .HasColumnName("chi_tiet");
+            entity.Property(e => e.DaXacThuc)
+                .HasDefaultValue(false)
+                .HasColumnName("da_xac_thuc");
+            entity.Property(e => e.NgayTao)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("ngay_tao");
+            entity.Property(e => e.PhuongThucId).HasColumnName("phuong_thuc_id");
+            entity.Property(e => e.TaiKhoanId).HasColumnName("tai_khoan_id");
+
+            entity.HasOne(d => d.PhuongThuc).WithMany(p => p.PhuongThucNguoiDungs)
+                .HasForeignKey(d => d.PhuongThucId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__phuong_th__phuon__17036CC0");
+
+            entity.HasOne(d => d.TaiKhoan).WithMany(p => p.PhuongThucNguoiDungs)
+                .HasForeignKey(d => d.TaiKhoanId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__phuong_th__tai_k__160F4887");
         });
 
         modelBuilder.Entity<PhuongThucThanhToan>(entity =>

@@ -11,3 +11,11 @@ các gói package cần cài (BEBE) :
     dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore
     # Cài thư viện mã hóa mật khẩu
     dotnet add package BCrypt.Net-Next
+
+
+//Nếu chuyên gia đăng nhập với tài khoản bị khóa
+const user = JSON.parse(localStorage.getItem("user"));
+if (user.trangThai === "khoa") {
+  alert("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+  window.location.href = "index.html";
+}

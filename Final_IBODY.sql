@@ -196,3 +196,23 @@ INSERT INTO giao_dich (hoa_don_id, phuong_thuc_id, so_tien, thoi_gian) VALUES
 -- 11. Đánh giá
 INSERT INTO danh_gia (lich_hen_id, nguoi_dung_id, chuyen_gia_id, diem_so, nhan_xet) VALUES
 (1, 1, 1, 5, N'Rất hài lòng, chuyên gia nhiệt tình và lắng nghe!');
+
+
+CREATE TABLE phuong_thuc_chung (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    ten NVARCHAR(50) UNIQUE NOT NULL,
+    mo_ta NVARCHAR(MAX),
+    trang_thai VARCHAR(10) CHECK (trang_thai IN ('hien', 'an')) DEFAULT 'hien'
+);
+
+CREATE TABLE phuong_thuc_nguoi_dung (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    tai_khoan_id INT NOT NULL FOREIGN KEY REFERENCES tai_khoan(id),
+    phuong_thuc_id INT NOT NULL FOREIGN KEY REFERENCES phuong_thuc_chung(id),
+    chi_tiet NVARCHAR(255),
+    da_xac_thuc BIT DEFAULT 0,
+    ngay_tao DATETIME DEFAULT GETDATE(),
+    UNIQUE(tai_khoan_id, phuong_thuc_id)
+);
+
+use Final_IBODY
