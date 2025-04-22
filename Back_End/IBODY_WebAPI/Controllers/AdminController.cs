@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using IBODY_WebAPI.Data;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace IBODY_WebAPI.Controllers
 {
-    //[AllowAnonymous]
-    [Authorize(Roles = "quan_tri")]
+    [AllowAnonymous]
+   //[Authorize(Roles = "quan_tri")]
     [ApiController]
     [Route("api/admin")]
     public class AdminController : ControllerBase
@@ -18,55 +20,73 @@ namespace IBODY_WebAPI.Controllers
         return Ok("Xin chào quản trị viên!");
     }
         private readonly FinalIbodyContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AdminController(FinalIbodyContext context)
+        public AdminController(FinalIbodyContext context,UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
 
         [HttpGet("accounts")]
         public async Task<IActionResult> GetAllAccounts()
         {
-            var accounts = await _context.TaiKhoans
-                .Select(t => new
+            var identityUsers = _userManager.Users.ToList(); // từ Identity
+            var taiKhoans = await _context.TaiKhoans.ToListAsync();
+
+            var result = taiKhoans.Select(tk =>
+            {
+                var identity = identityUsers.FirstOrDefault(u => u.Email == tk.Email);
+
+                return new
                 {
-                    t.Id,
-                    t.Email,
-                    t.VaiTro,
-                    t.TrangThai
-                })
-                .ToListAsync();
+                    id = tk.Id,
+                    email = tk.Email,
+                    vaiTro = tk.VaiTro,
+                    trangThai = tk.TrangThai,
+                    identityId = identity?.Id,
+                    fullName = identity?.FullName ?? ""
+                };
+            });
 
-            return Ok(accounts);
+            return Ok(result);
         }
 
-        [HttpPut("account/{id}")]
-        public async Task<IActionResult> UpdateAccount(int id, [FromBody] UpdateAccountDto dto)
-        {
-            var account = await _context.TaiKhoans.FindAsync(id);
-            if (account == null)
-                return NotFound(new { message = "Không tìm thấy tài khoản." });
 
-            account.VaiTro = dto.VaiTro;
-            account.TrangThai = dto.TrangThai;
 
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "Cập nhật tài khoản thành công." });
-        }
-
-        // ✅ Xóa tài khoản (hard delete)
+        // Xóa tài khoản 
         [HttpDelete("account/{id}")]
         public async Task<IActionResult> DeleteAccount(int id)
         {
-            var account = await _context.TaiKhoans.FindAsync(id);
-            if (account == null)
+            var taiKhoan = await _context.TaiKhoans.FindAsync(id);
+            if (taiKhoan == null)
                 return NotFound(new { message = "Không tìm thấy tài khoản." });
 
-            _context.TaiKhoans.Remove(account);
-            await _context.SaveChangesAsync();
+            // Nếu là người dùng: xoá bản ghi liên quan trong bảng nguoi_dung
+            var nguoiDung = await _context.NguoiDungs
+                .FirstOrDefaultAsync(nd => nd.TaiKhoanId == id);
+            if (nguoiDung != null)
+                _context.NguoiDungs.Remove(nguoiDung);
 
-            return Ok(new { message = "Đã xóa tài khoản thành công." });
+            //Nếu là chuyên gia: xoá bản ghi liên quan trong bảng chuyen_gia
+            var chuyenGia = await _context.ChuyenGia
+                .FirstOrDefaultAsync(cg => cg.TaiKhoanId == id);
+            if (chuyenGia != null)
+                _context.ChuyenGia.Remove(chuyenGia);
+
+            // xóa ở bảng identity
+            var identityUser = await _userManager.FindByEmailAsync(taiKhoan.Email);
+            if (identityUser != null)
+            {
+                await _userManager.DeleteAsync(identityUser);
+            }
+
+            // Xoá tài khoản
+            _context.TaiKhoans.Remove(taiKhoan);
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã xóa tài khoản và dữ liệu liên quan." });
         }
 
 
@@ -94,20 +114,29 @@ namespace IBODY_WebAPI.Controllers
         [HttpPost("expert-approve/{id}")]
         public async Task<IActionResult> ApproveExpert(int id)
         {
-        var expert = await _context.ChuyenGia.FindAsync(id);
-        if (expert == null)
-            return NotFound();
+            var expert = await _context.ChuyenGia.FindAsync(id);
+            if (expert == null)
+                return NotFound();
 
-        expert.TrangThai = "xac_thuc";
+            expert.TrangThai = "xac_thuc";
 
             // cập nhật role của tài khoản
-        var account = await _context.TaiKhoans.FindAsync(expert.TaiKhoanId);
-        if (account != null)
-            account.VaiTro = "chuyen_gia";
+            var account = await _context.TaiKhoans.FindAsync(expert.TaiKhoanId);
+            if (account != null)
+            {
+                account.VaiTro = "chuyen_gia";
 
-        await _context.SaveChangesAsync();
+                // ✅ Tìm và xóa người dùng khỏi bảng nguoi_dung
+                var nguoiDung = await _context.NguoiDungs
+                    .FirstOrDefaultAsync(nd => nd.TaiKhoanId == expert.TaiKhoanId);
 
-        return Ok(new { message = "Đã duyệt nâng cấp thành chuyên gia." });
+                if (nguoiDung != null)
+                    _context.NguoiDungs.Remove(nguoiDung);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã duyệt nâng cấp thành chuyên gia và chuyển dữ liệu hoàn tất." });
         }
 
 
@@ -117,8 +146,12 @@ namespace IBODY_WebAPI.Controllers
         {
         var expert = await _context.ChuyenGia.FindAsync(id);
         if (expert == null)
-            return NotFound();
+            return NotFound(new { message = "Không tìm thấy chuyên gia." });
 
+        if (expert.TrangThai != "cho_duyet")
+        {
+            return BadRequest(new { message = "Chuyên gia đã được xử lý. Không thể từ chối nữa." });
+        }
         expert.TrangThai = "tu_choi";
         await _context.SaveChangesAsync();
 
@@ -165,7 +198,10 @@ namespace IBODY_WebAPI.Controllers
             var lich = await _context.LichHens.FindAsync(id);
             if (lich == null)
                 return NotFound(new { message = "Không tìm thấy lịch hẹn." });
-
+            if (lich.TrangThai == "da_thanh_toan" || lich.TrangThai == "da_dien_ra")
+            {
+                return BadRequest(new { message = "Lịch đã thanh toán hoặc đã kết thúc, không thể chỉnh sửa." });
+            }
             lich.ThoiGianBatDau = dto.ThoiGianBatDau;
             lich.ThoiGianKetThuc = dto.ThoiGianKetThuc;
             lich.TomTat = dto.TomTat;
@@ -243,7 +279,7 @@ namespace IBODY_WebAPI.Controllers
         }
 
         // Lấy danh sách tất cả phương thức thanh toán hệ thống
-        [HttpGet("he-thong")]
+        [HttpGet("he-thong-phuong-thuc")]
         public async Task<IActionResult> GetAllSystemMethods()
         {
             var list = await _context.PhuongThucChungs
@@ -281,7 +317,7 @@ namespace IBODY_WebAPI.Controllers
         }
 
         //  Cập nhật phương thức
-        [HttpPut("cap-nhat/{id}")]
+        [HttpPut("capNhatPhuongThucThanhToan/{id}")]
         public async Task<IActionResult> UpdateSystemMethod(int id, [FromBody] ThemPhuongThucDto dto)
         {
             var pt = await _context.PhuongThucChungs.FindAsync(id);
@@ -297,7 +333,7 @@ namespace IBODY_WebAPI.Controllers
         }
 
         //Xóa phương thức
-        [HttpDelete("xoa/{id}")]
+        [HttpDelete("xoaPhuongThucThanhToan/{id}")]
         public async Task<IActionResult> DeleteSystemMethod(int id)
         {
             var pt = await _context.PhuongThucChungs.FindAsync(id);
@@ -307,6 +343,31 @@ namespace IBODY_WebAPI.Controllers
             _context.PhuongThucChungs.Remove(pt);
             await _context.SaveChangesAsync();
             return Ok(new { message = "Đã xóa phương thức thành công." });
+        }
+
+
+
+        // Lấy danh sách đánh giá của chuyên gia
+        [HttpGet("danh-gia-chuyen-gia")]
+        
+        public async Task<IActionResult> GetDanhGiaChuyenGia()
+        {
+            var danhGia = await _context.DanhGia
+                .Include(dg => dg.NguoiDung)
+                .ThenInclude(nd => nd.TaiKhoan)
+                .Include(dg => dg.ChuyenGia)
+                .Select(dg => new
+                {
+                    dg.Id,
+                    ChuyenGia = dg.ChuyenGia.HoTen,
+                    NguoiDanhGia = dg.NguoiDung.HoTen,
+                    EmailNguoiDanhGia = dg.NguoiDung.TaiKhoan.Email,
+                    dg.DiemSo,
+                    dg.NhanXet
+                })
+                .ToListAsync();
+
+            return Ok(danhGia);
         }
 
     }

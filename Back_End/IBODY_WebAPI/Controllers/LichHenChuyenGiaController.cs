@@ -24,7 +24,7 @@ namespace IBODY_WebAPI.Controllers
                 return Forbid("Tài khoản của bạn đã bị khóa.");
             
             var lich = await _context.LichHens
-                .Where(lh => lh.ChuyenGiaId == chuyenGiaId)
+                .Where(lh => lh.ChuyenGiaId == chuyenGiaId && lh.TrangThai == "da_thanh_toan")
                 .Include(lh => lh.NguoiDung)
                 .Include(lh => lh.HinhThuc)
                 .Select(lh => new
@@ -53,14 +53,18 @@ namespace IBODY_WebAPI.Controllers
             var tk = await _context.TaiKhoans.FindAsync(taiKhoanId);
             if (tk == null || tk.TrangThai == "khoa")
                 return Forbid("Tài khoản của bạn đã bị khóa.");
-                
+            
+            var lich = await _context.LichHens.FindAsync(lichHenId);
+
+
+            if (lich == null)
+                return NotFound(new { message = "Lịch hẹn không tồn tại." });
+            if (lich.TrangThai == "da_thanh_toan")
+                return BadRequest(new { message = "Lịch đã thanh toán, không thể hủy." });
+
             var danhGiaLienQuan = _context.DanhGia.Where(dg => dg.LichHenId == lichHenId);
             _context.DanhGia.RemoveRange(danhGiaLienQuan); // phải xóa đánh giá trước vì nó có khóa ngoại với lịch hẹn
             
-            var lich = await _context.LichHens.FindAsync(lichHenId);
-            if (lich == null)
-                return NotFound(new { message = "Lịch hẹn không tồn tại." });
-
             _context.LichHens.Remove(lich);
             await _context.SaveChangesAsync();
 

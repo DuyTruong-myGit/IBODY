@@ -17,28 +17,41 @@ namespace IBODY_WebAPI.Controllers
         [HttpGet("nguoi-dung/{nguoiDungId}")]
         public async Task<IActionResult> GetLichHenNguoiDung(int nguoiDungId)
         {
-            var lich = await _context.LichHens
+            var lichGoc = await _context.LichHens
                 .Where(lh => lh.NguoiDungId == nguoiDungId)
                 .Include(lh => lh.ChuyenGia)
                 .Include(lh => lh.HinhThuc)
-                .Select(lh => new
-                {
-                    lh.Id,
-                    lh.ThoiGianBatDau,
-                    lh.ThoiGianKetThuc,
-                    ChuyenGia = new
-                    {
-                        lh.ChuyenGia.Id,
-                        lh.ChuyenGia.HoTen,
-                        lh.ChuyenGia.ChuyenMon
-                    },
-                    HinhThuc = lh.HinhThuc.Ten,
-                    lh.TomTat
-                })
-                .OrderBy(lh => lh.ThoiGianBatDau)
                 .ToListAsync();
 
-            return Ok(lich);
+        // ✅ Tự động cập nhật trạng thái
+        foreach (var l in lichGoc)
+        {
+            if (l.TrangThai == "da_thanh_toan" && l.ThoiGianKetThuc < DateTime.Now)
+            {
+                l.TrangThai = "da_dien_ra";
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        var lich = lichGoc
+            .OrderBy(l => l.ThoiGianBatDau)
+            .Select(l => new
+            {
+                l.Id,
+                l.ThoiGianBatDau,
+                l.ThoiGianKetThuc,
+                ChuyenGia = new
+                {
+                    l.ChuyenGia.Id,
+                    l.ChuyenGia.HoTen,
+                    l.ChuyenGia.ChuyenMon
+                },
+                HinhThuc = l.HinhThuc.Ten,
+                l.TomTat,
+                l.TrangThai
+            }).ToList();
+
+        return Ok(lich);
         }
 
 
@@ -54,6 +67,9 @@ namespace IBODY_WebAPI.Controllers
             if (lich == null)
                 return NotFound(new { message = "Lịch hẹn không tồn tại." });
 
+            if (lich.TrangThai == "da_thanh_toan")
+                return BadRequest(new { message = "Lịch đã thanh toán, không thể hủy." });
+           
             _context.LichHens.Remove(lich);
             await _context.SaveChangesAsync();
 

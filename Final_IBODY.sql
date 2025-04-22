@@ -216,3 +216,8 @@ CREATE TABLE phuong_thuc_nguoi_dung (
 );
 
 use Final_IBODY
+
+
+ALTER TABLE lich_hen ADD trang_thai VARCHAR(20) 
+    CHECK (trang_thai IN ('cho_thanh_toan', 'da_thanh_toan', 'da_huy'))
+    DEFAULT 'cho_thanh_toan';

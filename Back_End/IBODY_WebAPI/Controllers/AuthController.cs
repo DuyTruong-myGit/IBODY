@@ -42,45 +42,69 @@ namespace IBODY_WebAPI.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            // Gán mặc định vai trò người dùng
+            //  Gán role Identity
             if (!await _roleManager.RoleExistsAsync("nguoi_dung"))
                 await _roleManager.CreateAsync(new IdentityRole("nguoi_dung"));
 
             await _userManager.AddToRoleAsync(user, "nguoi_dung");
 
-            return Ok("Đăng ký thành công");
+            //  THÊM VÀO BẢNG `tai_khoan` để đồng bộ
+            var taiKhoan = new TaiKhoan
+            {
+                Email = user.Email,
+                MatKhau = "hashed_by_identity", // Hoặc để null vì dùng identity
+                VaiTro = "nguoi_dung",
+                TrangThai = "hoat_dong"
+            };
+
+            _context.TaiKhoans.Add(taiKhoan);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đăng ký thành công" });
         }
 
-        // ✅ Đăng nhập
+        //  Đăng nhập
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
+            // Tìm user từ Identity
             var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null) return Unauthorized("Không tìm thấy tài khoản");
+            if (user == null)
+                return Unauthorized(new { message = "Email không tồn tại." });
 
+            // Kiểm tra mật khẩu
             var result = await _signInManager.PasswordSignInAsync(user, dto.Password, true, false);
-            if (!result.Succeeded) return Unauthorized("Sai mật khẩu");
+            if (!result.Succeeded)
+                return Unauthorized(new { message = "Mật khẩu không đúng." });
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            var taiKhoan = await _context.TaiKhoans
-                .FirstOrDefaultAsync(tk => tk.Email == user.Email);
+            // PHẢI kiểm tra tồn tại bản ghi tai_khoan
+            var tk = await _context.TaiKhoans
+                .FirstOrDefaultAsync(t => t.Email == user.Email);
+
+            if (tk == null)
+                return Forbid("Tài khoản chưa được đăng ký đầy đủ trong hệ thống.");
+
+            // Chặn nếu bị khoá
+            if (tk.TrangThai == "khoa")
+                return Forbid("Tài khoản của bạn đã bị khóa.");
+
             return Ok(new
             {
-                message = "Đăng nhập thành công",
+                message = "Đăng nhập thành công!",
                 user = new
                 {
-                    user.Email,
-                    user.FullName,
+                    taiKhoanId = tk.Id,
+                    email = user.Email,
+                    fullName = user.FullName,
                     roles = roles,
-                    taiKhoanId = user.Id,
-                    trangThai = taiKhoan?.TrangThai
-
+                    trangThai = tk.TrangThai
                 }
             });
         }
+    
     }
-
     public class RegisterDto
     {
         public string Email { get; set; } = null!;

@@ -54,7 +54,8 @@ namespace IBODY_WebAPI.Controllers
                 HinhThucId = dto.HinhThucId,
                 ThoiGianBatDau = dto.ThoiGianBatDau,
                 ThoiGianKetThuc = dto.ThoiGianKetThuc,
-                TomTat = dto.TomTat
+                TomTat = dto.TomTat,
+                TrangThai = "cho_thanh_toan"
             };
 
             _context.LichHens.Add(lichHen);

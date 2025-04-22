@@ -367,6 +367,11 @@ public partial class FinalIbodyContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("thoi_gian_ket_thuc");
             entity.Property(e => e.TomTat).HasColumnName("tom_tat");
+            entity.Property(e => e.TrangThai)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValue("cho_thanh_toan")
+                .HasColumnName("trang_thai");
 
             entity.HasOne(d => d.ChuyenGia).WithMany(p => p.LichHens)
                 .HasForeignKey(d => d.ChuyenGiaId)
