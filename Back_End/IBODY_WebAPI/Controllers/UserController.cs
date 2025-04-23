@@ -1,7 +1,7 @@
 using IBODY_WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using IBODY_WebAPI.Helpers;
 namespace IBODY_WebAPI.Controllers
 {
     [ApiController]
@@ -113,26 +113,6 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { message = "Đã gửi đánh giá!" });
         }
 
-
-        // // Bình luận chuyên gia	Cho phép không cần hẹn (tuỳ), dùng binh_luan
-        // [HttpPost("them_BinhLuan")]
-        // public async Task<IActionResult> BinhLuan([FromBody] BinhLuanDto dto)
-        // {
-        //     var binhLuan = new BinhLuan
-        //     {
-        //         NguoiBinhLuanId = dto.NguoiBinhLuanId,
-        //         LoaiDoiTuong = "chuyen_gia",
-        //         DoiTuongId = dto.ChuyenGiaId,
-        //         NoiDung = dto.NoiDung,
-        //         ThoiGian = DateTime.Now
-        //     };
-
-        //     _context.BinhLuans.Add(binhLuan);
-        //     await _context.SaveChangesAsync();
-
-        //     return Ok(new { message = "Đã gửi bình luận." });
-        // }
-
         // THỰC HIỆN THANH TOÁN LỊCH HẸN
         [HttpPost("thanh-toan-lich-hen")]
         public async Task<IActionResult> ThanhToanLichHen([FromBody] ThanhToanDto dto)
@@ -168,7 +148,82 @@ namespace IBODY_WebAPI.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { message = "Thanh toán thành công!" });
         }
+        
 
+        [HttpPost("guiTinNhan")]
+        public async Task<IActionResult> GuiTinNhan([FromBody] GuiTinNhanDto dto)
+        {
+            var tinNhan = new TinNhan
+            {
+                NguoiGuiId = dto.NguoiGuiId,
+                NguoiNhanId = dto.NguoiNhanId,
+                NoiDung = dto.NoiDung,
+                ThoiGian = DateTime.Now
+            };
+            if (BadWordsFilter.ContainsBadWords(dto.NoiDung))
+            {
+                return BadRequest(new { message = "Tin nhắn chứa từ ngữ không phù hợp." });
+            }
+
+            _context.TinNhans.Add(tinNhan);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã gửi tin nhắn." });
+        }
+
+        [HttpGet("lichSuTinNhan")]
+        public async Task<IActionResult> LichSuTinNhan([FromQuery] int taiKhoan1, [FromQuery] int taiKhoan2)
+        {
+            var lichSu = await _context.TinNhans
+                .Where(t =>
+                    (t.NguoiGuiId == taiKhoan1 && t.NguoiNhanId == taiKhoan2) ||
+                    (t.NguoiGuiId == taiKhoan2 && t.NguoiNhanId == taiKhoan1))
+                .OrderBy(t => t.ThoiGian)
+                .ToListAsync();
+
+            return Ok(lichSu);
+        }
+
+
+        [HttpGet("lichSuTuVan/{taiKhoanId}")]
+        public async Task<IActionResult> GetLichSuTuVan(int taiKhoanId)
+        {
+            // Tìm người dùng
+            var nguoiDung = await _context.NguoiDungs
+                .FirstOrDefaultAsync(nd => nd.TaiKhoanId == taiKhoanId);
+
+            if (nguoiDung == null)
+                return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            var lichSu = await _context.LichHens
+                .Where(lh => lh.NguoiDungId == nguoiDung.Id && lh.TrangThai == "da_thanh_toan")
+                .Include(lh => lh.ChuyenGia)
+                .Include(lh => lh.HinhThuc)
+                .Join(_context.HoaDons,
+                    lh => lh.NguoiDung.TaiKhoanId,
+                    hd => hd.TaiKhoanId,
+                    (lh, hd) => new { LichHen = lh, HoaDon = hd })
+                .Join(_context.GiaoDiches,
+                    combo => combo.HoaDon.Id,
+                    gd => gd.HoaDonId,
+                    (combo, gd) => new
+                    {
+                        combo.LichHen.Id,
+                        ChuyenGia = combo.LichHen.ChuyenGia.HoTen,
+                        combo.LichHen.ThoiGianBatDau,
+                        combo.LichHen.ThoiGianKetThuc,
+                        combo.LichHen.TomTat,
+                        combo.LichHen.HinhThuc.Ten,
+                        HoaDonId = combo.HoaDon.Id,
+                        TongTien = combo.HoaDon.TongTien,
+                        PhuongThucId = gd.PhuongThucId,
+                        ThoiGianThanhToan = gd.ThoiGian
+                    })
+                .OrderByDescending(x => x.ThoiGianThanhToan)
+                .ToListAsync();
+
+            return Ok(lichSu);
+        }
 
 
     }
@@ -210,6 +265,13 @@ namespace IBODY_WebAPI.Controllers
     public int TaiKhoanId { get; set; }
     public int PhuongThucId { get; set; }
     public decimal SoTien { get; set; }
+}
+
+    public class GuiTinNhanDto
+{
+    public int NguoiGuiId { get; set; }
+    public int NguoiNhanId { get; set; }
+    public string NoiDung { get; set; } = null!;
 }
 
 }

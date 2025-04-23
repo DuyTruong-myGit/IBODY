@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IBODY_WebAPI.Models;
+using IBODY_WebAPI.Helpers;
 
 namespace IBODY_WebAPI.Controllers
 {
@@ -57,6 +58,109 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
+        [HttpPost("guiTinNhan")]
+        public async Task<IActionResult> ExpertGuiTinNhan([FromBody] GuiTinNhanDto dto)
+        {
+            var coLichHen = await _context.LichHens.AnyAsync(lh =>
+                lh.ChuyenGia.TaiKhoanId == dto.NguoiGuiId &&
+                lh.NguoiDung.TaiKhoanId == dto.NguoiNhanId &&
+                lh.TrangThai == "da_thanh_toan");
+
+            if (!coLichHen)
+            {
+                return Forbid("Bạn chỉ có thể nhắn với người dùng đã đặt lịch và đã thanh toán.");
+            }
+
+            var tinNhan = new TinNhan
+            {
+                NguoiGuiId = dto.NguoiGuiId,
+                NguoiNhanId = dto.NguoiNhanId,
+                NoiDung = dto.NoiDung,
+                ThoiGian = DateTime.Now
+            };
+
+            if (BadWordsFilter.ContainsBadWords(dto.NoiDung))
+            {
+                return BadRequest(new { message = "Tin nhắn chứa từ ngữ không phù hợp." });
+            }
+
+
+            _context.TinNhans.Add(tinNhan);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã gửi tin nhắn từ chuyên gia." });
+        }
+
+        [HttpGet("lichSuTinNhan")]
+        public async Task<IActionResult> LichSuTinNhan([FromQuery] int taiKhoan1, [FromQuery] int taiKhoan2)
+        {
+            var lichSu = await _context.TinNhans
+                .Where(t =>
+                    (t.NguoiGuiId == taiKhoan1 && t.NguoiNhanId == taiKhoan2) ||
+                    (t.NguoiGuiId == taiKhoan2 && t.NguoiNhanId == taiKhoan1))
+                .OrderBy(t => t.ThoiGian)
+                .ToListAsync();
+
+            return Ok(lichSu);
+        }
+
+
+        [HttpGet("hoaDonCuaChuyenGia")]
+        public async Task<IActionResult> GetHoaDonTuVan(int chuyenGiaTaiKhoanId)
+        {
+            var hoaDons = await _context.LichHens
+                .Include(lh => lh.NguoiDung)
+                .Include(lh => lh.HinhThuc)
+                .Where(lh => lh.ChuyenGia.TaiKhoanId == chuyenGiaTaiKhoanId && lh.TrangThai == "da_thanh_toan")
+                .Join(_context.HoaDons,
+                    lichHen => lichHen.NguoiDung.TaiKhoanId,
+                    hoaDon => hoaDon.TaiKhoanId,
+                    (lichHen, hoaDon) => new
+                    {
+                        HoaDonId = hoaDon.Id,
+                        TaiKhoanNguoiDung = hoaDon.TaiKhoanId,
+                        TenNguoiDung = lichHen.NguoiDung.HoTen,
+                        ThoiGianTao = hoaDon.ThoiGianTao,
+                        TongTien = hoaDon.TongTien,
+                        HinhThuc = lichHen.HinhThuc.Ten,
+                        TuVanThoiGian = lichHen.ThoiGianBatDau
+                    })
+                .OrderByDescending(h => h.ThoiGianTao)
+                .ToListAsync();
+
+            return Ok(hoaDons);
+        }
+
+        // API lấy danh sách đánh giá của chuyên gia
+        [HttpGet("danhGia/{taiKhoanId}")]
+        public async Task<IActionResult> GetDanhGiaCuaToi(int taiKhoanId)
+        {
+            // Tìm chuyên gia theo tài khoản ID
+            var chuyenGia = await _context.ChuyenGia
+                .FirstOrDefaultAsync(cg => cg.TaiKhoanId == taiKhoanId);
+
+            if (chuyenGia == null)
+                return NotFound(new { message = "Không tìm thấy chuyên gia tương ứng với tài khoản." });
+
+            var danhGiaList = await _context.DanhGia
+                .Where(dg => dg.ChuyenGiaId == chuyenGia.Id)
+                .Include(dg => dg.NguoiDung)
+                    .ThenInclude(nd => nd.TaiKhoan)
+                .Include(dg => dg.LichHen)
+                .OrderByDescending(dg => dg.LichHen.ThoiGianBatDau)
+                .Select(dg => new
+                {
+                    dg.Id,
+                    HoTenNguoiDung = dg.NguoiDung.HoTen,
+                    EmailNguoiDung = dg.NguoiDung.TaiKhoan.Email,
+                    ThoiGianTuvan = dg.LichHen.ThoiGianBatDau,
+                    DiemSo = dg.DiemSo,
+                    NhanXet = dg.NhanXet
+                })
+                .ToListAsync();
+
+            return Ok(danhGiaList);
+        }
 
 
     }
@@ -76,5 +180,7 @@ namespace IBODY_WebAPI.Controllers
     public string MatKhauCu { get; set; } = null!;
     public string MatKhauMoi { get; set; } = null!;
 }
+
+
 
 }

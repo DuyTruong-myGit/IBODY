@@ -2,6 +2,7 @@ using IBODY_WebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using IBODY_WebAPI.Data;
+using IBODY_WebAPI.Helpers;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -34,12 +35,15 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 // ✅ Add Controllers & JSON options
 builder.Services.AddControllers();
 
 // ✅ Add Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+BadWordsFilter.Load("Configs/badwords.json");
 
 var app = builder.Build();
 

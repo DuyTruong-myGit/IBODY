@@ -99,7 +99,32 @@ namespace IBODY_WebAPI.Controllers
             });
         }
 
+        [HttpGet("avgDanhGia/{id}")]
+        public async Task<IActionResult> ThongKeDanhGia(int chuyenGiaId)
+        {
+            var danhGias = await _context.DanhGia
+                .Where(dg => dg.ChuyenGiaId == chuyenGiaId)
+                .ToListAsync();
+
+            if (!danhGias.Any())
+            {
+                return Ok(new
+                {
+                    DiemTrungBinh = 0,
+                    SoLuongDanhGia = 0
+                });
+            }
+
+            var diemTB = Math.Round(danhGias.Average(dg => dg.DiemSo.GetValueOrDefault()), 1);
+            var soLuong = danhGias.Count;
+
+            return Ok(new
+            {
+                DiemTrungBinh = diemTB,
+                SoLuongDanhGia = soLuong
+            });
+        }
 
 
     }
-}
+}  

@@ -6,6 +6,6 @@ namespace IBODY_WebAPI.Models
     {
         public string? FullName { get; set; }
         public string? Gender { get; set; }
-        public DateOnly? Dob { get; set; }
+        public DateTime? Dob { get; set; }
     }
 }

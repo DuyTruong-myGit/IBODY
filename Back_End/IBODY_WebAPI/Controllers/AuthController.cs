@@ -35,7 +35,7 @@ namespace IBODY_WebAPI.Controllers
                 Email = dto.Email,
                 FullName = dto.FullName,
                 Gender = dto.Gender,
-                Dob = dto.Dob
+                Dob = dto.Dob,
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -48,18 +48,29 @@ namespace IBODY_WebAPI.Controllers
 
             await _userManager.AddToRoleAsync(user, "nguoi_dung");
 
-            //  THÊM VÀO BẢNG `tai_khoan` để đồng bộ
+            //  THÊM VÀO BẢNG tài khoản để đồng bộ
             var taiKhoan = new TaiKhoan
             {
                 Email = user.Email,
-                MatKhau = "hashed_by_identity", // Hoặc để null vì dùng identity
+                MatKhau = "hashed_by_identity",
                 VaiTro = "nguoi_dung",
                 TrangThai = "hoat_dong"
             };
 
             _context.TaiKhoans.Add(taiKhoan);
             await _context.SaveChangesAsync();
+            //THÊM VÀO BẢNG người dùngdùng để đồng bộ
+            var nguoiDung = new NguoiDung
+            {
+                TaiKhoanId = taiKhoan.Id,
+                HoTen = user.FullName,
+                GioiTinh = user.Gender,
+                NgaySinh = user.Dob,
+                MucTieuTamLy = null
+            };
 
+            _context.NguoiDungs.Add(nguoiDung);
+            await _context.SaveChangesAsync();
             return Ok(new { message = "Đăng ký thành công" });
         }
 
@@ -111,7 +122,7 @@ namespace IBODY_WebAPI.Controllers
         public string Password { get; set; } = null!;
         public string? FullName { get; set; }
         public string? Gender { get; set; }
-        public DateOnly? Dob { get; set; }
+        public DateTime? Dob { get; set; }
     }
 
     public class LoginDto

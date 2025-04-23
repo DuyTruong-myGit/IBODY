@@ -114,29 +114,53 @@ namespace IBODY_WebAPI.Controllers
         [HttpPost("expert-approve/{id}")]
         public async Task<IActionResult> ApproveExpert(int id)
         {
+            // var expert = await _context.ChuyenGia.FindAsync(id);
+            // if (expert == null)
+            //     return NotFound();
+
+            // expert.TrangThai = "xac_thuc";
+
+            // // cập nhật role của tài khoản
+            // var account = await _context.TaiKhoans.FindAsync(expert.TaiKhoanId);
+            // if (account != null)
+            // {
+            //     account.VaiTro = "chuyen_gia";
+
+            //     // ✅ Tìm và xóa người dùng khỏi bảng nguoi_dung
+            //     var nguoiDung = await _context.NguoiDungs
+            //         .FirstOrDefaultAsync(nd => nd.TaiKhoanId == expert.TaiKhoanId);
+
+            //     if (nguoiDung != null)
+            //         _context.NguoiDungs.Remove(nguoiDung);
+            // }
+
+            // await _context.SaveChangesAsync();
+
+            // return Ok(new { message = "Đã duyệt nâng cấp thành chuyên gia và chuyển dữ liệu hoàn tất." });
             var expert = await _context.ChuyenGia.FindAsync(id);
             if (expert == null)
-                return NotFound();
+                return NotFound(new { message = "Không tìm thấy hồ sơ chuyên gia cần duyệt." });
+
+            if (expert.TrangThai != "cho_duyet")
+                return BadRequest(new { message = "Hồ sơ đã được xử lý." });
 
             expert.TrangThai = "xac_thuc";
 
-            // cập nhật role của tài khoản
+            // ✅ Cập nhật tài khoản
             var account = await _context.TaiKhoans.FindAsync(expert.TaiKhoanId);
             if (account != null)
             {
                 account.VaiTro = "chuyen_gia";
 
-                // ✅ Tìm và xóa người dùng khỏi bảng nguoi_dung
+                // ✅ Xóa bản ghi người dùng nếu có
                 var nguoiDung = await _context.NguoiDungs
                     .FirstOrDefaultAsync(nd => nd.TaiKhoanId == expert.TaiKhoanId);
-
                 if (nguoiDung != null)
                     _context.NguoiDungs.Remove(nguoiDung);
             }
 
             await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Đã duyệt nâng cấp thành chuyên gia và chuyển dữ liệu hoàn tất." });
+            return Ok(new { message = "Đã duyệt nâng cấp thành chuyên gia." });
         }
 
 
@@ -347,28 +371,172 @@ namespace IBODY_WebAPI.Controllers
 
 
 
-        // Lấy danh sách đánh giá của chuyên gia
-        [HttpGet("danh-gia-chuyen-gia")]
+        // // Lấy danh sách đánh giá của chuyên gia
+        // [HttpGet("danhSachDanhGia")]
         
-        public async Task<IActionResult> GetDanhGiaChuyenGia()
+        // public async Task<IActionResult> GetDanhGiaChuyenGia()
+        // {
+        //     var danhGia = await _context.DanhGia
+        //         .Include(dg => dg.NguoiDung)
+        //         .ThenInclude(nd => nd.TaiKhoan)
+        //         .Include(dg => dg.ChuyenGia)
+        //         .Select(dg => new
+        //         {
+        //             dg.Id,
+        //             ChuyenGia = dg.ChuyenGia.HoTen,
+        //             NguoiDanhGia = dg.NguoiDung.HoTen,
+        //             EmailNguoiDanhGia = dg.NguoiDung.TaiKhoan.Email,
+        //             dg.DiemSo,
+        //             dg.NhanXet
+        //         })
+        //         .ToListAsync();
+
+        //     return Ok(danhGia);
+        // }
+
+
+        // [HttpDelete("xoaDanhGia/{id}")]
+        // public async Task<IActionResult> XoaDanhGia(int id)
+        // {
+        //     var danhGia = await _context.DanhGia.FindAsync(id);
+        //     if (danhGia == null)
+        //         return NotFound(new { message = "Không tìm thấy đánh giá." });
+
+        //     _context.DanhGia.Remove(danhGia);
+        //     await _context.SaveChangesAsync();
+
+        //     return Ok(new { message = "Đã xóa đánh giá thành công." });
+        // }
+
+        // Lấy lịch sử chat
+        [HttpGet("chat/lich-su")]
+        public async Task<IActionResult> LichSuChatAdmin([FromQuery] int taiKhoan1, [FromQuery] int taiKhoan2)
         {
-            var danhGia = await _context.DanhGia
-                .Include(dg => dg.NguoiDung)
-                .ThenInclude(nd => nd.TaiKhoan)
-                .Include(dg => dg.ChuyenGia)
-                .Select(dg => new
+            var tinNhanList = await _context.TinNhans
+                .Where(t =>
+                    (t.NguoiGuiId == taiKhoan1 && t.NguoiNhanId == taiKhoan2) ||
+                    (t.NguoiGuiId == taiKhoan2 && t.NguoiNhanId == taiKhoan1))
+                .OrderBy(t => t.ThoiGian)
+                .Select(t => new
                 {
-                    dg.Id,
-                    ChuyenGia = dg.ChuyenGia.HoTen,
-                    NguoiDanhGia = dg.NguoiDung.HoTen,
-                    EmailNguoiDanhGia = dg.NguoiDung.TaiKhoan.Email,
-                    dg.DiemSo,
-                    dg.NhanXet
+                    t.Id,
+                    t.NguoiGuiId,
+                    t.NguoiNhanId,
+                    t.NoiDung,
+                    t.ThoiGian
                 })
                 .ToListAsync();
 
-            return Ok(danhGia);
+            return Ok(tinNhanList);
         }
+
+        //Xóa 1 tin nhắn
+        [HttpDelete("chat/xoa1TinNhan/{id}")]
+        public async Task<IActionResult> XoaTinNhan(int id)
+        {
+            var tinNhan = await _context.TinNhans.FindAsync(id);
+            if (tinNhan == null)
+                return NotFound(new { message = "Không tìm thấy tin nhắn." });
+
+            _context.TinNhans.Remove(tinNhan);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã xóa tin nhắn." });
+        }
+
+        //Xóa toàn bộ đoạn chat giữa 2 tài khoản
+        [HttpDelete("chat/xoaToanBo")]
+        public async Task<IActionResult> XoaDoanChat([FromQuery] int taiKhoan1, [FromQuery] int taiKhoan2)
+        {
+            var tinNhanList = await _context.TinNhans
+                .Where(t =>
+                    (t.NguoiGuiId == taiKhoan1 && t.NguoiNhanId == taiKhoan2) ||
+                    (t.NguoiGuiId == taiKhoan2 && t.NguoiNhanId == taiKhoan1))
+                .ToListAsync();
+
+            _context.TinNhans.RemoveRange(tinNhanList);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã xóa toàn bộ đoạn chat giữa 2 tài khoản." });
+        }
+
+
+        [HttpGet("hoaDonPhiaChuyenGia")]
+        public async Task<IActionResult> GetAllHoaDon()
+        {
+            var list = await _context.HoaDons
+                .Include(h => h.TaiKhoan)
+                .Select(h => new
+                {
+                    h.Id,
+                    Email = h.TaiKhoan.Email,
+                    h.TongTien,
+                    h.ThoiGianTao
+                })
+                .OrderByDescending(h => h.ThoiGianTao)
+                .ToListAsync();
+
+            return Ok(list);
+        }
+
+
+        [HttpDelete("huyHoaDon/{id}")]
+        public async Task<IActionResult> DeleteHoaDon(int id)
+        {
+            var hoaDon = await _context.HoaDons.FindAsync(id);
+            if (hoaDon == null)
+                return NotFound(new { message = "Không tìm thấy hóa đơn." });
+
+            // Cũng xoá các giao dịch liên quan nếu có
+            var giaoDich = await _context.GiaoDiches
+                .Where(g => g.HoaDonId == hoaDon.Id)
+                .ToListAsync();
+
+            _context.GiaoDiches.RemoveRange(giaoDich);
+            _context.HoaDons.Remove(hoaDon);
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã xóa hóa đơn và các giao dịch liên quan." });
+        }
+
+        // Lấy danh sách đánh giá của chuyên gia
+        [HttpGet("danhGiaCuaChuyenGia")]
+        public async Task<IActionResult> GetAllDanhGiaChuyenGia()
+        {
+            var list = await _context.DanhGia
+                .Include(dg => dg.NguoiDung).ThenInclude(nd => nd.TaiKhoan)
+                .Include(dg => dg.ChuyenGia).ThenInclude(cg => cg.TaiKhoan)
+                .Select(dg => new
+                {
+                    dg.Id,
+                    NguoiDanhGia = dg.NguoiDung.HoTen,
+                    EmailNguoiDung = dg.NguoiDung.TaiKhoan.Email,
+                    ChuyenGia = dg.ChuyenGia.HoTen,
+                    EmailChuyenGia = dg.ChuyenGia.TaiKhoan.Email,
+                    DiemSo = dg.DiemSo,
+                    NhanXet = dg.NhanXet
+                })
+                .OrderByDescending(d => d.Id)
+                .ToListAsync();
+
+            return Ok(list);
+        }
+
+        // Xóa đánh giá sai sự thật
+        [HttpDelete("xoaDanhGia/{id}")]
+        public async Task<IActionResult> XoaDanhGiaChuyenGia(int id)
+        {
+            var danhGia = await _context.DanhGia.FindAsync(id);
+            if (danhGia == null)
+                return NotFound(new { message = "Không tìm thấy đánh giá." });
+
+            _context.DanhGia.Remove(danhGia);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã xoá đánh giá thành công." });
+        }
+
+
 
     }
 
