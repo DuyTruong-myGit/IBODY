@@ -17,5 +17,5 @@ public partial class GiaoDich
 
     public virtual HoaDon? HoaDon { get; set; }
 
-    public virtual PhuongThucThanhToan? PhuongThuc { get; set; }
+    public virtual PhuongThucChung? PhuongThuc { get; set; }
 }

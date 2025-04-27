@@ -47,6 +47,18 @@ BadWordsFilter.Load("Configs/badwords.json");
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    if (!await roleManager.RoleExistsAsync("quan_tri"))
+    {
+        var role = new IdentityRole("quan_tri");
+        await roleManager.CreateAsync(role);
+        Console.WriteLine("Vai trò 'quan_tri' đã được thêm thành công.");
+    }
+}
+
 // ✅ Use middleware
 app.UseCors("AllowAll");
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý phương thức thanh toán</title>
+  <link rel="stylesheet" href="../CSS/index.css" />
+  <link rel="stylesheet" href="../CSS/admin.css" />
+</head>
+<body>
+  <header class="admin-header">
+    <h2>Trang Quản Trị</h2>
+    <nav>
+      <a href="admin-dashboard.html">Tổng quan</a>
+      <a href="admin-users.html">Tài khoản</a>
+      <a href="admin-duyet-chuyen-gia.html">Duyệt chuyên gia</a>
+      <a href="admin-reports.html">Tố cáo</a>
+      <a href="admin-lichhen.html">Lịch hẹn</a>
+      <a href="admin-danhgia.html">Đánh giá</a>
+      <a href="adminHoaDon.html">Hóa đơn</a>
+      <a href="adminPhuongThuc.html" class="active">Phương thức</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-container">
+    <h3>Danh sách phương thức thanh toán</h3>
+
+    <form id="addForm">
+      <input type="text" id="ten" placeholder="Tên phương thức" required>
+      <input type="text" id="moTa" placeholder="Mô tả (tùy chọn)">
+      <select id="trangThai">
+        <option value="hien">Hiện</option>
+        <option value="an">Ẩn</option>
+      </select>
+      <button type="submit">Thêm mới</button>
+    </form>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tên</th>
+          <th>Mô tả</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="ptttBody"></tbody>
+    </table>
+  </main>
+
+  <script src="../JS/adminPhuongThuc.js"></script>
+</body>
+</html>

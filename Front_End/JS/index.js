@@ -49,10 +49,11 @@ registerForm.addEventListener("submit", async (event) => {
   }
 
   const userData = {
-    username: email, 
-    password: password,
-    fullName: fullName,
-    email: email
+    fullName,
+    email,
+    password,
+    gender: null, // nếu sau này thêm select => lấy value ở đây
+    dob: null     // nếu có input type="date" => lấy từ registerForm.dob.value
   };
 
   try {
@@ -65,13 +66,32 @@ registerForm.addEventListener("submit", async (event) => {
     });
 
     const result = await response.json();
+
     if (response.ok) {
-      localStorage.setItem("user", JSON.stringify(result.user));
-      alert("Đăng ký thành công! Vui lòng tiếp tục hoàn tất hồ sơ.");
-      closeAuthModal();
-      window.location.href = "../HTML/setup-choose-role.html";
+      // ✅ Sau khi đăng ký xong → tự động đăng nhập luôn
+      const loginRes = await fetch("http://localhost:5221/api/Auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      });
+
+      const loginResult = await loginRes.json();
+
+      if (loginRes.ok) {
+        localStorage.setItem("user", JSON.stringify(loginResult.user));
+        alert("Đăng ký & đăng nhập thành công!");
+        closeAuthModal();
+        window.location.href = "index.html"; // Trang chủ
+      } else {
+        alert("Đăng ký thành công, nhưng tự động đăng nhập thất bại.");
+      }
     } else {
-      alert(result.message || "Đăng ký thất bại");
+      alert(result.message || "Đăng ký thất bại.");
     }
   } catch (err) {
     console.error(err);
@@ -86,10 +106,7 @@ loginForm.addEventListener("submit", async (event) => {
   const email = loginForm.email.value;
   const password = loginForm.password.value;
 
-  const loginData = {
-    username: email,
-    password: password
-  };
+  const loginData = { email, password };
 
   try {
     const response = await fetch("http://localhost:5221/api/Auth/login", {
@@ -102,12 +119,24 @@ loginForm.addEventListener("submit", async (event) => {
 
     const result = await response.json();
     if (response.ok) {
-      alert("Đăng nhập thành công!");
-      localStorage.setItem("user", JSON.stringify(result.user)); // lưu user tạm
-      closeAuthModal();
-      window.location.href = "index.html"; // về trang chủ
-    } else {
-      alert(result.message || "Sai tài khoản hoặc mật khẩu");
+      const user = result.user;
+      console.log("USER LOGGED IN:", user);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // Kiểm tra quyền và chuyển hướng
+      console.log("→ Chuẩn bị redirect... user.roles = ", user.roles);
+
+      if (Array.isArray(user.roles)) {
+        if (user.roles.includes("quan_tri")) {
+          console.log("✅ Quyền admin xác thực → chuyển trang!");
+          setTimeout(() => {
+            window.location.replace("admin-dashboard.html");
+          }, 100);
+        } else {
+          console.log("👤 Quyền người dùng → về index");
+          window.location.replace("index.html");
+        }
+      }
     }
   } catch (err) {
     console.error(err);

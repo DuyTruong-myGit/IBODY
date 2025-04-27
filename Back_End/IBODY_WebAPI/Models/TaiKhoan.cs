@@ -27,8 +27,6 @@ public partial class TaiKhoan
 
     public virtual ICollection<PhuongThucNguoiDung> PhuongThucNguoiDungs { get; set; } = new List<PhuongThucNguoiDung>();
 
-    public virtual ICollection<PhuongThucThanhToan> PhuongThucThanhToans { get; set; } = new List<PhuongThucThanhToan>();
-
     public virtual ICollection<ThongBao> ThongBaos { get; set; } = new List<ThongBao>();
 
     public virtual ICollection<TinNhan> TinNhanNguoiGuis { get; set; } = new List<TinNhan>();

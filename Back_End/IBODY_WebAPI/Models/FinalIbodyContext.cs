@@ -53,13 +53,7 @@ public partial class FinalIbodyContext : DbContext
 
     public virtual DbSet<PhuongThucNguoiDung> PhuongThucNguoiDungs { get; set; }
 
-    public virtual DbSet<PhuongThucThanhToan> PhuongThucThanhToans { get; set; }
-
     public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
-
-    public virtual DbSet<The> Thes { get; set; }
-
-    public virtual DbSet<TheChuyenGium> TheChuyenGia { get; set; }
 
     public virtual DbSet<ThoiGianRanhChuyenGium> ThoiGianRanhChuyenGia { get; set; }
 
@@ -260,7 +254,7 @@ public partial class FinalIbodyContext : DbContext
 
             entity.HasOne(d => d.PhuongThuc).WithMany(p => p.GiaoDiches)
                 .HasForeignKey(d => d.PhuongThucId)
-                .HasConstraintName("FK__giao_dich__phuon__6EF57B66");
+                .HasConstraintName("FK_giao_dich_phuong_thuc_chung");
         });
 
         modelBuilder.Entity<GoiDichVu>(entity =>
@@ -462,25 +456,6 @@ public partial class FinalIbodyContext : DbContext
                 .HasConstraintName("FK__phuong_th__tai_k__160F4887");
         });
 
-        modelBuilder.Entity<PhuongThucThanhToan>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__phuong_t__3213E83F8EEF827F");
-
-            entity.ToTable("phuong_thuc_thanh_toan");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ChiTiet).HasColumnName("chi_tiet");
-            entity.Property(e => e.Loai)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasColumnName("loai");
-            entity.Property(e => e.TaiKhoanId).HasColumnName("tai_khoan_id");
-
-            entity.HasOne(d => d.TaiKhoan).WithMany(p => p.PhuongThucThanhToans)
-                .HasForeignKey(d => d.TaiKhoanId)
-                .HasConstraintName("FK__phuong_th__tai_k__6A30C649");
-        });
-
         modelBuilder.Entity<TaiKhoan>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__tai_khoa__3213E83FFEC7DD92");
@@ -506,37 +481,6 @@ public partial class FinalIbodyContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasColumnName("vai_tro");
-        });
-
-        modelBuilder.Entity<The>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__the__3213E83F537AD6B7");
-
-            entity.ToTable("the");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Ten)
-                .HasMaxLength(100)
-                .HasColumnName("ten");
-        });
-
-        modelBuilder.Entity<TheChuyenGium>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__the_chuy__3213E83FC2762867");
-
-            entity.ToTable("the_chuyen_gia");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ChuyenGiaId).HasColumnName("chuyen_gia_id");
-            entity.Property(e => e.TheId).HasColumnName("the_id");
-
-            entity.HasOne(d => d.ChuyenGia).WithMany(p => p.TheChuyenGia)
-                .HasForeignKey(d => d.ChuyenGiaId)
-                .HasConstraintName("FK__the_chuye__chuye__778AC167");
-
-            entity.HasOne(d => d.The).WithMany(p => p.TheChuyenGia)
-                .HasForeignKey(d => d.TheId)
-                .HasConstraintName("FK__the_chuye__the_i__787EE5A0");
         });
 
         modelBuilder.Entity<ThoiGianRanhChuyenGium>(entity =>

@@ -25,7 +25,7 @@ namespace IBODY_WebAPI.Controllers
             _context = context;
         }
 
-        // ✅ Đăng ký
+        //✅ Đăng ký
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
@@ -78,29 +78,29 @@ namespace IBODY_WebAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            // Tìm user từ Identity
+            var tk = await _context.TaiKhoans
+            .FirstOrDefaultAsync(t => t.Email == dto.Email);
+
+            if (tk == null)
+                return Forbid("Tài khoản chưa được đăng ký đầy đủ trong hệ thống.");
+
+            // Bước 2: Chặn nếu bị khóa
+            if (tk.TrangThai == "khoa")
+                return Forbid("Tài khoản của bạn đã bị khóa.");
+
+            // Bước 3: Tìm user từ Identity
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
                 return Unauthorized(new { message = "Email không tồn tại." });
 
-            // Kiểm tra mật khẩu
+            // Bước 4: Kiểm tra mật khẩu
             var result = await _signInManager.PasswordSignInAsync(user, dto.Password, true, false);
             if (!result.Succeeded)
                 return Unauthorized(new { message = "Mật khẩu không đúng." });
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            // PHẢI kiểm tra tồn tại bản ghi tai_khoan
-            var tk = await _context.TaiKhoans
-                .FirstOrDefaultAsync(t => t.Email == user.Email);
-
-            if (tk == null)
-                return Forbid("Tài khoản chưa được đăng ký đầy đủ trong hệ thống.");
-
-            // Chặn nếu bị khoá
-            if (tk.TrangThai == "khoa")
-                return Forbid("Tài khoản của bạn đã bị khóa.");
-
+            // Bước 5: Trả về thông tin đăng nhập
             return Ok(new
             {
                 message = "Đăng nhập thành công!",
@@ -114,6 +114,63 @@ namespace IBODY_WebAPI.Controllers
                 }
             });
         }
+
+
+
+        // [HttpPost("register")]
+        // public async Task<IActionResult> RegisterAdmin(RegisterDto dto)
+        // {
+        //     var user = new ApplicationUser
+        //     {
+        //         UserName = dto.Email,
+        //         Email = dto.Email,
+        //         FullName = dto.FullName,
+        //         Gender = dto.Gender,
+        //         Dob = dto.Dob,
+        //     };
+
+        //     var result = await _userManager.CreateAsync(user, dto.Password);
+        //     if (!result.Succeeded)
+        //         return BadRequest(result.Errors);
+
+        //     // Nếu vai trò không tồn tại thì tạo mới
+        //     if (!await _roleManager.RoleExistsAsync(dto.VaiTro))
+        //         await _roleManager.CreateAsync(new IdentityRole(dto.VaiTro));
+
+        //     // Gán role vào Identity
+        //     await _userManager.AddToRoleAsync(user, dto.VaiTro);
+
+        //     // Đồng bộ với bảng tài khoản
+        //     var taiKhoan = new TaiKhoan
+        //     {
+        //         Email = user.Email,
+        //         MatKhau = "hashed_by_identity",
+        //         VaiTro = dto.VaiTro,
+        //         TrangThai = "hoat_dong"
+        //     };
+
+        //     _context.TaiKhoans.Add(taiKhoan);
+        //     await _context.SaveChangesAsync();
+
+        //     if (dto.VaiTro == "nguoi_dung")
+        //     {
+        //         var nguoiDung = new NguoiDung
+        //         {
+        //             TaiKhoanId = taiKhoan.Id,
+        //             HoTen = user.FullName,
+        //             GioiTinh = user.Gender,
+        //             NgaySinh = user.Dob,
+        //             MucTieuTamLy = null
+        //         };
+
+        //         _context.NguoiDungs.Add(nguoiDung);
+        //         await _context.SaveChangesAsync();
+        //     }
+
+        //     // Nếu là quản trị thì không thêm vào bảng NguoiDung mà chờ xử lý riêng nếu cần
+
+        //     return Ok(new { message = $"Đăng ký thành công với vai trò {dto.VaiTro}" });
+        // }
     
     }
     public class RegisterDto
@@ -130,4 +187,14 @@ namespace IBODY_WebAPI.Controllers
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
     }
+//     public class RegisterDto
+// {
+//     public string Email { get; set; } = null!;
+//     public string Password { get; set; } = null!;
+//     public string? FullName { get; set; }
+//     public string? Gender { get; set; }
+//     public DateTime? Dob { get; set; }
+
+//     public string VaiTro { get; set; } = "nguoi_dung"; 
+// }
 }

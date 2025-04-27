@@ -29,7 +29,5 @@ public partial class ChuyenGium
 
     public virtual TaiKhoan? TaiKhoan { get; set; }
 
-    public virtual ICollection<TheChuyenGium> TheChuyenGia { get; set; } = new List<TheChuyenGium>();
-
     public virtual ICollection<ThoiGianRanhChuyenGium> ThoiGianRanhChuyenGia { get; set; } = new List<ThoiGianRanhChuyenGium>();
 }

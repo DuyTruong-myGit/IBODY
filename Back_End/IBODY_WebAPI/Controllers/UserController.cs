@@ -55,7 +55,6 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
-
         [HttpPut("change-password/{accountId}")]
         public async Task<IActionResult> ChangePassword(int accountId, [FromBody] ChangePasswordDto dto)
         {
@@ -142,7 +141,7 @@ namespace IBODY_WebAPI.Controllers
             };
             _context.GiaoDiches.Add(giaoDich);
 
-            // ✅ Cập nhật trạng thái lịch hẹn
+            // Cập nhật trạng thái lịch hẹn
             lichHen.TrangThai = "da_thanh_toan";
 
             await _context.SaveChangesAsync();
@@ -252,12 +251,7 @@ namespace IBODY_WebAPI.Controllers
     public string NewPassword { get; set; } = null!;
 }
 
-//    public class BinhLuanDto
-// {
-//     public int NguoiBinhLuanId { get; set; }  
-//     public int ChuyenGiaId { get; set; }   
-//     public string NoiDung { get; set; } = null!;
-// }
+
 
     public class ThanhToanDto
 {

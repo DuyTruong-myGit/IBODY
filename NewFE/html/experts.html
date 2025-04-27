@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Danh sách chuyên gia</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <!-- 🔹 Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <div class="logo">MindConnect</div>
+      <nav class="menu">
+        <a href="../index.html">Trang chủ</a>
+        <a href="experts.html">Chuyên gia</a>
+        <a href="contact.html">Liên hệ</a>
+        <select id="roleSelect" style="margin-left: 20px; padding: 6px 10px; border-radius: 5px;">
+          <option value="">-- Chọn vai trò --</option>
+          <option value="user">Người dùng</option>
+          <option value="admin">Admin</option>
+        </select>
+      </nav>
+    </div>
+  </header>  
+  
+
+  <!-- 🔹 Danh sách chuyên gia -->
+  <main class="expert-section">
+    <div class="container">
+      <h1 class="section-title">Tất cả chuyên gia</h1>
+
+      <!-- 🔎 Tìm kiếm -->
+      <div style="text-align:center; margin-bottom: 30px;">
+        <input type="text" id="searchBox" placeholder="Tìm chuyên gia theo tên..." style="padding: 10px; width: 300px; border-radius: 6px; border: 1px solid #ccc;">
+      </div>
+
+      <!-- 🔽 Checkbox bộ lọc -->
+      <div style="text-align: center; margin-bottom: 30px;">
+        <span style="font-weight: bold;">Chọn chuyên môn:</span><br />
+        <label><input type="checkbox" class="filter-checkbox" value="Tâm lý học hành vi"> Tâm lý học hành vi</label>
+        <label><input type="checkbox" class="filter-checkbox" value="Tư vấn tâm lý học đường"> Tư vấn tâm lý học đường</label>
+        <label><input type="checkbox" class="filter-checkbox" value="Tâm lý học phát triển"> Tâm lý học phát triển</label>
+      </div>
+
+      <!-- 🟧 Grid render chuyên gia -->
+      <div class="expert-grid" id="expertList"></div>
+    </div>
+  </main>
+
+  <!-- ✅ Script -->
+  <script>
+    const experts = [
+      {
+        name: "Nguyễn Thị Mai",
+        specialty: "Tâm lý học hành vi",
+        experience: "10 năm kinh nghiệm",
+        price: "800.000đ / buổi",
+        img: "../assets/img/expert1.jpg"
+      },
+      {
+        name: "Trần Minh Tú",
+        specialty: "Tư vấn tâm lý học đường",
+        experience: "7 năm kinh nghiệm",
+        price: "650.000đ / buổi",
+        img: "../assets/img/expert2.jpg"
+      },
+      {
+        name: "Phạm Hồng Sơn",
+        specialty: "Tâm lý học phát triển",
+        experience: "12 năm kinh nghiệm",
+        price: "900.000đ / buổi",
+        img: "../assets/img/expert3.jpg"
+      }
+    ];
+
+    function renderExperts() {
+      const expertList = document.getElementById("expertList");
+      expertList.innerHTML = "";
+
+      experts.forEach((expert) => {
+        const card = document.createElement("div");
+        card.className = "expert-card";
+        card.setAttribute("data-specialty", expert.specialty);
+
+        card.innerHTML = `
+          <img src="${expert.img}" alt="${expert.name}" class="expert-img" />
+          <h3>${expert.name}</h3>
+          <p>${expert.specialty}</p>
+          <p>${expert.experience}</p>
+          <p class="price">${expert.price}</p>
+          <button onclick="location.href='expert-detail.html'">Xem chi tiết</button>
+        `;
+
+        expertList.appendChild(card);
+      });
+    }
+
+    function applyFilters() {
+      const keyword = document.getElementById("searchBox").value.toLowerCase();
+      const selectedSpecialties = Array.from(document.querySelectorAll(".filter-checkbox"))
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
+      const expertCards = document.querySelectorAll(".expert-card");
+
+      expertCards.forEach(card => {
+        const name = card.querySelector("h3").innerText.toLowerCase();
+        const specialty = card.getAttribute("data-specialty");
+
+        const matchName = name.includes(keyword);
+        const matchSpecialty =
+          selectedSpecialties.length === 0 || selectedSpecialties.includes(specialty);
+
+        card.style.display = (matchName && matchSpecialty) ? "block" : "none";
+      });
+    }
+
+    // Gọi khi load
+    window.onload = () => {
+      renderExperts();
+      document.getElementById("searchBox").addEventListener("input", applyFilters);
+      document.querySelectorAll(".filter-checkbox").forEach(cb =>
+        cb.addEventListener("change", applyFilters)
+      );
+    };
+  </script>
+
+  <!-- Xử lí logic chọn vai trò -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const roleSelect = document.getElementById("roleSelect");
+  
+      // Nếu đã lưu vai trò, tự động chọn
+      const savedRole = localStorage.getItem("userRole");
+      if (savedRole && roleSelect) {
+        roleSelect.value = savedRole;
+      }
+  
+      roleSelect.addEventListener("change", function () {
+        const role = roleSelect.value;
+        localStorage.setItem("userRole", role); // Lưu vai trò vào localStorage
+  
+        if (role === "user") {
+          alert("Bạn đã chọn vai trò Người dùng.");
+          window.location.href = "../index.html";
+        } else if (role === "admin") {
+          alert("Bạn đã chọn vai trò Admin. Chuyển đến trang quản trị.");
+          window.location.href = "admin.html";
+        }
+      });
+    });
+  </script>  
+
+</body>
+</html>

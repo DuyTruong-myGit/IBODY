@@ -48,9 +48,13 @@ namespace IBODY_WebAPI.Controllers
                     identityId = identity?.Id,
                     fullName = identity?.FullName ?? ""
                 };
-            });
+            }).ToList();
 
-            return Ok(result);
+            return Ok(new
+            {
+                count = result.Count,
+                data = result
+            });
         }
 
 
@@ -107,36 +111,17 @@ namespace IBODY_WebAPI.Controllers
             cg.TrangThai
         }).ToListAsync();
 
-        return Ok(pending);
+         return Ok(new
+            {
+                count = pending.Count,
+                data = pending
+            });
         }   
 
 
         [HttpPost("expert-approve/{id}")]
         public async Task<IActionResult> ApproveExpert(int id)
         {
-            // var expert = await _context.ChuyenGia.FindAsync(id);
-            // if (expert == null)
-            //     return NotFound();
-
-            // expert.TrangThai = "xac_thuc";
-
-            // // cập nhật role của tài khoản
-            // var account = await _context.TaiKhoans.FindAsync(expert.TaiKhoanId);
-            // if (account != null)
-            // {
-            //     account.VaiTro = "chuyen_gia";
-
-            //     // ✅ Tìm và xóa người dùng khỏi bảng nguoi_dung
-            //     var nguoiDung = await _context.NguoiDungs
-            //         .FirstOrDefaultAsync(nd => nd.TaiKhoanId == expert.TaiKhoanId);
-
-            //     if (nguoiDung != null)
-            //         _context.NguoiDungs.Remove(nguoiDung);
-            // }
-
-            // await _context.SaveChangesAsync();
-
-            // return Ok(new { message = "Đã duyệt nâng cấp thành chuyên gia và chuyển dữ liệu hoàn tất." });
             var expert = await _context.ChuyenGia.FindAsync(id);
             if (expert == null)
                 return NotFound(new { message = "Không tìm thấy hồ sơ chuyên gia cần duyệt." });
@@ -212,7 +197,11 @@ namespace IBODY_WebAPI.Controllers
                 .OrderByDescending(lh => lh.ThoiGianBatDau)
                 .ToListAsync();
 
-            return Ok(lich);
+             return Ok(new
+                {
+                    count = lich.Count,
+                    data = lich
+                });
         }
 
         // Cập nhật lịch hẹn trên hệ thống
@@ -270,7 +259,11 @@ namespace IBODY_WebAPI.Controllers
                 .OrderByDescending(bc => bc.ThoiGian)
                 .ToListAsync();
 
-            return Ok(danhSach);
+              return Ok(new
+                {
+                    count = danhSach.Count,
+                    data = danhSach
+                });
         }
         // khóa tài khoản chuyên gia
         [HttpPost("khoa-tai-khoan/{id}")]
@@ -371,43 +364,7 @@ namespace IBODY_WebAPI.Controllers
 
 
 
-        // // Lấy danh sách đánh giá của chuyên gia
-        // [HttpGet("danhSachDanhGia")]
         
-        // public async Task<IActionResult> GetDanhGiaChuyenGia()
-        // {
-        //     var danhGia = await _context.DanhGia
-        //         .Include(dg => dg.NguoiDung)
-        //         .ThenInclude(nd => nd.TaiKhoan)
-        //         .Include(dg => dg.ChuyenGia)
-        //         .Select(dg => new
-        //         {
-        //             dg.Id,
-        //             ChuyenGia = dg.ChuyenGia.HoTen,
-        //             NguoiDanhGia = dg.NguoiDung.HoTen,
-        //             EmailNguoiDanhGia = dg.NguoiDung.TaiKhoan.Email,
-        //             dg.DiemSo,
-        //             dg.NhanXet
-        //         })
-        //         .ToListAsync();
-
-        //     return Ok(danhGia);
-        // }
-
-
-        // [HttpDelete("xoaDanhGia/{id}")]
-        // public async Task<IActionResult> XoaDanhGia(int id)
-        // {
-        //     var danhGia = await _context.DanhGia.FindAsync(id);
-        //     if (danhGia == null)
-        //         return NotFound(new { message = "Không tìm thấy đánh giá." });
-
-        //     _context.DanhGia.Remove(danhGia);
-        //     await _context.SaveChangesAsync();
-
-        //     return Ok(new { message = "Đã xóa đánh giá thành công." });
-        // }
-
         // Lấy lịch sử chat
         [HttpGet("chat/lich-su")]
         public async Task<IActionResult> LichSuChatAdmin([FromQuery] int taiKhoan1, [FromQuery] int taiKhoan2)
@@ -519,7 +476,7 @@ namespace IBODY_WebAPI.Controllers
                 .OrderByDescending(d => d.Id)
                 .ToListAsync();
 
-            return Ok(list);
+            return Ok( new { count = list.Count, data = list });
         }
 
         // Xóa đánh giá sai sự thật
@@ -535,7 +492,14 @@ namespace IBODY_WebAPI.Controllers
 
             return Ok(new { message = "Đã xoá đánh giá thành công." });
         }
+        [HttpGet("demSoLuongChuyenGia")]
+        public async Task<IActionResult> CountChuyenGia()
+        {
+            var count = await _context.TaiKhoans
+                .CountAsync(tk => tk.VaiTro == "chuyen_gia");
 
+            return Ok(new { count });
+        }
 
 
     }

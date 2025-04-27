@@ -121,10 +121,19 @@ CREATE TABLE phuong_thuc_thanh_toan (
 CREATE TABLE giao_dich (
     id INT IDENTITY(1,1) PRIMARY KEY,
     hoa_don_id INT FOREIGN KEY REFERENCES hoa_don(id),
-    phuong_thuc_id INT FOREIGN KEY REFERENCES phuong_thuc_thanh_toan(id),
+    phuong_thuc_id INT FOREIGN KEY REFERENCES phuong_thuc_chung(id),
     so_tien DECIMAL(10,2),
     thoi_gian DATETIME
 );
+
+ALTER TABLE giao_dich
+ADD CONSTRAINT FK_giao_dich_phuong_thuc_chung
+FOREIGN KEY (phuong_thuc_id) REFERENCES phuong_thuc_chung(id);
+
+SELECT *
+FROM giao_dich
+WHERE phuong_thuc_id NOT IN (SELECT id FROM phuong_thuc_chung);
+
 
 CREATE TABLE bao_cao_vi_pham (
     id INT IDENTITY(1,1) PRIMARY KEY,
@@ -223,8 +232,12 @@ ALTER TABLE lich_hen ADD trang_thai VARCHAR(20)
     DEFAULT 'cho_thanh_toan';
 
 
+	EXEC sp_help 'giao_dich';
 
 
 SELECT *
 FROM lich_hen
 WHERE id = 1;
+
+
+SELECT * FROM tai_khoan WHERE email = 'admin@123gmail.com'
