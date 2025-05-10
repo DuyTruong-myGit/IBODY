@@ -10,38 +10,48 @@
 
 
   <header class="header">
-        <div class="logo">
-          <span class="symbol">♂♀</span>
-          <span class="brand">ibody</span>
+    <div class="logo">
+      <span class="symbol">♂♀</span>
+      <span class="brand">ibody</span>
+    </div>
+    
+    <button id="menu-toggle" class="menu-toggle">☰</button>
+  
+      <nav class="nav">
+      <a href="Index.html" class="active">Trang chủ</a>
+      <a href="https://www.facebook.com/groups/1717452315821331">Cộng Đồng</a>
+      <a href="../HTML/NguoiDung/search-expert.html">Tư vấn</a>
+      <a href="../HTML/NguoiDung/tin-nhan-user.html">Nhắn tin</a>
+      <a href="../HTML/NguoiDung/lich-hen-user.html">Lịch hẹn</a>
+      <a href="../HTML/NguoiDung/payment-methods.html">Thanh toán</a>
+      <a href="../HTML/NguoiDung/bill-popup.html">Bill sau khi tthanh toán</a>
+      <a href="../HTML/NguoiDung/ho-tro-user.html">Hỗ trợ</a>
+
+      <!-- hết test  -->
+      <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập/Đăng ký</a>
+      <div class="user-menu" id="userMenu" style="display: none;">
+        <div class="user-button" onclick="toggleUserDropdown()">
+          <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="avatar">
+          <span id="usernameDisplay"></span>
         </div>
-        <nav class="nav">
-          <a href="./Index.html" class="active">Trang chủ</a>
-          <a href="#">Khóa Học </a>
-          <a href="#">Game</a>
-          <a href="./lich-trinh.html">Lịch Trình</a>
-          <a href="#">Cộng Đồng</a>
-          <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập</a>
-          <div class="user-menu" id="userMenu" style="display: none;">
-            <div class="user-button" onclick="toggleUserDropdown()">
-              <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="avatar">
-              <span id="usernameDisplay"></span>
-            </div>
-            <div class="user-dropdown" id="userDropdown">
-              <a href="./profile.html">👤 Trang cá nhân</a>
-              <a href="settings.html">⚙️ Cài đặt & quyền riêng tư</a>
-              <a href="help.html">❓ Trợ giúp & hỗ trợ</a>
-              <a href="#" onclick="logout()">🚪 Đăng xuất</a>
-            </div>
-          </div>
-          
-        </nav>
-      </header>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="profile.html">Trang cá nhân</a>
+          <a href="../HTML/NguoiDung/settings-user.html">Cài đặt & quyền riêng tư</a>
+          <a href="../HTML/NguoiDung/settings-upgrade.html">Nâng cấp thành chuyên gia</a>
+          <a href="../HTML/NguoiDung/ho-tro-user.html">Hỗ trợ</a>
+          <a href="#" onclick="logout()">Đăng xuất</a>
+        </div>
+      </div>
+      
+    </nav>
+
+  </header>
 
   <div class="profile-container">
     <div class="tab-buttons">
       <button class="tab-btn active" data-tab="view">Thông tin tài khoản</button>
       <button class="tab-btn" data-tab="info">Thay đổi thông tin</button>
-      <button class="tab-btn" data-tab="password">Đổi mật khẩu</button>
+      <!-- <button class="tab-btn" data-tab="password">Đổi mật khẩu</button> -->
       <button class="tab-btn" data-tab="history">Lịch sử tư vấn</button>
     </div>
 
@@ -71,7 +81,7 @@
         <button type="submit">Lưu thay đổi</button>
       </form>
     </div>
-
+<!-- 
     <div class="tab-content hidden" id="password-tab">
       <form id="changePasswordForm">
         <label>Mật khẩu hiện tại: <input type="password" id="currentPassword" required></label>
@@ -79,7 +89,7 @@
         <label>Nhập lại mật khẩu mới: <input type="password" id="confirmNewPassword" required></label>
         <button type="submit">Đổi mật khẩu</button>
       </form>
-    </div>
+    </div> -->
 
     <div class="tab-content hidden" id="history-tab">
       <div id="lichSuTuVanList">Đang tải lịch sử...</div>

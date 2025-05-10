@@ -4,45 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IBODY</title>
-    <link rel="stylesheet" href="../CSS/index.css">
+    <link rel="stylesheet" href="../../CSS/chuyenGia/indexChuyenGia.css">
 </head>
 <body>
-  <header class="header">
-    <div class="logo">
-      <span class="symbol">♂♀</span>
-      <span class="brand">ibody</span>
-    </div>
-    
-    <button id="menu-toggle" class="menu-toggle">☰</button>
-  
-      <nav class="nav">
-      <a href="Index.html" class="active">Trang chủ</a>
-      <a href="https://www.facebook.com/groups/1717452315821331">Cộng Đồng</a>
-      <a href="../HTML/NguoiDung/search-expert.html">Tư vấn</a>
-      <a href="../HTML/NguoiDung/tin-nhan-user.html">Nhắn tin</a>
-      <a href="../HTML/NguoiDung/lich-hen-user.html">Lịch hẹn</a>
-      <a href="../HTML/NguoiDung/bill-popup.html">Bill sau khi tthanh toán</a>
-      <a href="../HTML/NguoiDung/ho-tro-user.html">Hỗ trợ</a>
-
-      <!-- hết test  -->
-      <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập/Đăng ký</a>
-      <div class="user-menu" id="userMenu" style="display: none;">
-        <div class="user-button" onclick="toggleUserDropdown()">
-          <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="avatar">
-          <span id="usernameDisplay"></span>
+    <header class="header">
+        <div class="logo">
+          <span class="symbol">♂♀</span>
+          <span class="brand">ibody</span>
         </div>
-        <div class="user-dropdown" id="userDropdown">
-          <a href="profile.html">Trang cá nhân</a>
-          <a href="../HTML/NguoiDung/settings-user.html">Cài đặt & quyền riêng tư</a>
-          <a href="../HTML/NguoiDung/settings-upgrade.html">Nâng cấp thành chuyên gia</a>
-          <a href="../HTML/NguoiDung/ho-tro-user.html">Hỗ trợ</a>
-          <a href="#" onclick="logout()">Đăng xuất</a>
-        </div>
-      </div>
-      
-    </nav>
-
-  </header>
+        <nav class="nav">
+          <a href="indexChuyenGia.html" class="active">🏠 Trang chủ</a>
+          <a href="../chuyenGia/TongHopChuyenGia.html">📊 Quản lý thống kê</a>
+          <a href="../chuyenGia/appointments-expert.html">📅 Lịch hẹn</a>
+          <a href="../chuyenGia/clients-expert.html">👥 Khách hàng</a>
+          <a href="../chuyenGia/tin-nhan.html">💬 Tin nhắn</a>
+          <a href="../chuyenGia/profile.html">👤 Hồ sơ cá nhân</a>
+          <!-- <a href="../chuyenGia/settings-expert.html">⚙️ Cài đặt</a> -->
+          <a href="#" onclick="logout()">🚪 Đăng xuất</a>
+        </nav>
+      </header>
     
       <section class="hero">
         <div class="hero-content">
@@ -56,7 +36,7 @@
               Hãy cùng ibody bảo vệ người dùng trước những nguy cơ xâm hại,<br>
               tìm hiểu thêm về giáo dục giới tính và nâng cao nhận thức trong cộng đồng bạn nhé!
             </p>
-            <button onclick="window.location.href='./NguoiDung/search-expert.html'">Tìm kiếm chuyên gia ngay!</button>
+            <button>Tìm kiếm chuyên gia ngay !</button>
           </div>
           <img src="https://cdn-icons-png.flaticon.com/512/8832/8832360.png" alt="Wave Hand" class="icon-right">
         </div>
@@ -135,7 +115,7 @@
     </div>
   </div>
 
-      <script src="../JS/index.js"></script>
+      <script src="../../JS/NguoiDung/logout.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý tài khoản</title>
+  <link rel="stylesheet" href="../../CSS/index.css" />
+  <link rel="stylesheet" href="../../CSS/admin.css" />
+</head>
+<body>
+  <header class="admin-header">
+    <h2>Trang Quản Trị</h2>
+    <nav>
+        <a href="admin-dashboard.html">Tổng quan</a>
+        <a href="admin-users.html" class="active">Tài khoản</a>
+        <a href="admin-duyet-chuyen-gia.html">Duyệt chuyên gia</a>
+        <a href="admin-reports.html">Tố cáo</a>
+        <a href="admin-lichhen.html">Lịch hẹn</a>
+        <a href="admin-danhgia.html">Đánh giá</a>
+        <a href="adminHoaDon.html">Hóa đơn</a>
+        <a href="adminPhuongThuc.html">Phương thức</a>
+        <a href="#" id="logoutLink" style="color: red;">Đăng xuất</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-container">
+    <h3>Danh sách tài khoản</h3>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>Vai trò</th>
+          <th>Trạng thái</th>
+          <th>Họ tên</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <!-- dữ liệu tài khoản sẽ được load tại đây -->
+      </tbody>
+    </table>
+  </main>
+
+  <script src="../../JS/Admin/admin-users.js"></script>
+</body>
+</html>

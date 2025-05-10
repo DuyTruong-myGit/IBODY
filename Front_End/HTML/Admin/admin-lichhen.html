@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý Lịch hẹn</title>
+  <link rel="stylesheet" href="../../CSS/index.css" />
+  <link rel="stylesheet" href="../../CSS/admin.css" />
+</head>
+<body>
+  <header class="admin-header">
+    <h2>Trang Quản Trị</h2>
+    <nav>
+        <a href="admin-dashboard.html">Tổng quan</a>
+        <a href="admin-users.html">Tài khoản</a>
+        <a href="admin-duyet-chuyen-gia.html">Duyệt chuyên gia</a>
+        <a href="admin-reports.html">Tố cáo</a>
+        <a href="admin-lichhen.html"class="active">Lịch hẹn</a>
+        <a href="admin-danhgia.html">Đánh giá</a>
+        <a href="adminHoaDon.html">Hóa đơn</a>
+        <a href="adminPhuongThuc.html" >Phương thức</a>
+        <a href="#" id="logoutLink" style="color: red;">Đăng xuất</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-container">
+    <h3>Danh sách lịch hẹn</h3>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Người dùng</th>
+          <th>Chuyên gia</th>
+          <th>Chuyên môn</th>
+          <th>Thời gian bắt đầu</th>
+          <th>Thời gian kết thúc</th>
+          <th>Hình thức</th>
+          <th>Tóm tắt</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="lichHenTableBody">
+        <!-- Dữ liệu sẽ được load tại đây -->
+      </tbody>
+    </table>
+  </main>
+  
+  <!-- Modal sửa lịch hẹn -->
+<div id="modalEdit" class="modal">
+    <div class="modal-content">
+      <h4>Sửa lịch hẹn</h4>
+      <input type="text" id="editTomTat" placeholder="Tóm tắt">
+      <label>Thời gian bắt đầu:</label>
+      <input type="datetime-local" id="editBatDau">
+      <label>Thời gian kết thúc:</label>
+      <input type="datetime-local" id="editKetThuc">
+      <div class="modal-actions">
+        <button onclick="submitEdit()">Lưu</button>
+        <button onclick="closeModal()" style="color:red;">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../JS/Admin/admin-lichhen.js"></script>
+</body>
+</html>

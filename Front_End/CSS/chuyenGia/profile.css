@@ -1,0 +1,153 @@
+.profile-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Tabs */
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: #eee;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: 600;
+}
+
+.tab-btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Section headers */
+.tab-content h3, .tab-content h4 {
+  color: #333;
+  margin-bottom: 16px;
+}
+
+/* Info section */
+.tab-content#info p {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+/* Forms */
+form input[type="text"],
+form input[type="number"],
+form input[type="password"],
+form input[type="time"],
+form select,
+form textarea {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  margin: 10px 0;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border 0.3s;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+form button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-right: 8px;
+  transition: background-color 0.3s;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
+/* Schedule table */
+#scheduleTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+#scheduleTable th,
+#scheduleTable td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+#scheduleTable th {
+  background-color: #f8f8f8;
+  color: #333;
+  font-weight: bold;
+}
+
+#scheduleTable td button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+#scheduleTable td button:first-child {
+  background-color: #ffc107;
+  color: #fff;
+  margin-right: 6px;
+}
+
+#scheduleTable td button:last-child {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .tab-buttons {
+    flex-direction: column;
+  }
+
+  #scheduleTable th,
+  #scheduleTable td {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  form input,
+  form select,
+  form textarea,
+  form button {
+    font-size: 14px;
+  }
+}

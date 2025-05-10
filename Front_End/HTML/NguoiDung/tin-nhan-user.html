@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iBody Messenger - Người dùng</title>
+  <link rel="stylesheet" href="../../CSS/NguoiDung/tin-nhan.css">
+  <link rel="stylesheet" href="../../CSS/index.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <span class="symbol">♂♀</span>
+      <span class="brand">ibody</span>
+    </div>
+    <nav class="nav">
+        <a href="../Index.html" class="active">Trang chủ</a>
+        <a href="https://www.facebook.com/groups/1717452315821331">Cộng Đồng</a>
+        <a href="search-expert.html">Tư vấn</a>
+        <a href="tin-nhan-user.html">Nhắn tin</a>
+        <a href="lich-hen-user.html">Lịch hẹn</a>
+        <a href="bill-popup.html">Bill sau khi tthanh toán</a>
+        <a href="ho-tro-user.html">Hỗ trợ</a>
+      <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập/Đăng ký</a>
+      <div class="user-menu" id="userMenu" style="display: none;">
+        <div class="user-button" onclick="toggleUserDropdown()">
+          <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="avatar">
+          <span id="usernameDisplay"></span>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="../profile.html">Trang cá nhân</a>
+          <a href="../HTML/NguoiDung/settings-user.html">Cài đặt & quyền riêng tư</a>
+          <a href="../HTML/NguoiDung/settings-upgrade.html">Nâng cấp thành chuyên gia</a>
+          <a href="../HTML/NguoiDung/ho-tro-user.html">Hỗ trợ</a>
+          <a href="#" onclick="logout()">Đăng xuất</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <div class="chat-container">
+    <aside class="chat-list">
+      <h3>Chuyên gia đã kết nối</h3>
+      <ul id="expertList"></ul>
+    </aside>
+
+    <main class="chat-box">
+      <h3 id="expertName">Chọn chuyên gia để trò chuyện</h3>
+      <div id="messageList" class="message-list"></div>
+
+      <form id="messageForm">
+        <textarea id="messageInput" placeholder="Nhập tin nhắn..." rows="3" required></textarea>
+        <button type="submit">Gửi</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="../../JS/NguoiDung/tin-nhan-user.js"></script>
+</body>
+</html>

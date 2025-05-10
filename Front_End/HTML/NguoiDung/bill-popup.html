@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biên Lai Thanh Toán</title>
+    <link rel="stylesheet" href="../../CSS/NguoiDung/bill-popup.css">
+</head>
+<body>
+ <div class="invoice-container">
+    <h1>Hóa đơn thanh toán</h1>
+    <div class="invoice">
+      <p><strong>Khách hàng:</strong> <span id="userFullName">...</span></p>
+      <p><strong>Email:</strong> <span id="userEmail">...</span></p>
+      <p><strong>Ngày thanh toán:</strong> <span id="paymentDate">...</span></p>
+      <p><strong>Giờ thanh toán:</strong> <span id="paymentTime">...</span></p>
+      <p><strong>Phương thức thanh toán:</strong> <span id="paymentMethod">...</span></p>
+      <hr/>
+      <p><strong>Gói tư vấn:</strong></p>
+      <ul>
+        <li><strong>Tên gói:</strong> <span id="paymentMethod">...</span></li>
+        <li><strong>Giá:</strong> <span id="coursePrice">...</span></li>
+      </ul>
+      <hr/>
+      <p><strong>Tổng tiền:</strong> <span id="paymentAmount">...</span></p>
+    </div>
+    <button onclick="window.print()">In hóa đơn</button>
+  </div>
+
+<script src="../../JS/NguoiDung/bill-popup.js"></script>
+</body>
+</html>

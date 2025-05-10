@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Sử Giao Dịch</title>
+    <link rel="stylesheet" href="../../CSS/NguoiDung/transaction-history.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>Lịch Sử Giao Dịch</h1>
+            <button class="btn-add" onclick="showTransactionForm()">Thêm Giao Dịch</button>
+        </div>
+    </header>
+
+    <!-- Lịch sử giao dịch -->
+    <section class="transactions">
+        <div class="container">
+            <div class="transaction-list" id="transactionList">
+                <!-- Các giao dịch sẽ được hiển thị tại đây -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Form thêm giao dịch -->
+    <div id="addTransactionForm" class="add-transaction-form">
+        <div class="form-container">
+            <button class="close-form" onclick="closeTransactionForm()">X</button>
+            <h3>Thêm Giao Dịch</h3>
+            <form id="transactionForm">
+                <label for="transactionTitle">Tiêu Đề:</label>
+                <input type="text" id="transactionTitle" required>
+
+                <label for="transactionDescription">Mô Tả:</label>
+                <textarea id="transactionDescription" required></textarea>
+
+                <label for="transactionAmount">Số Tiền:</label>
+                <input type="number" id="transactionAmount" required>
+
+                <label for="transactionDate">Ngày:</label>
+                <input type="date" id="transactionDate" required>
+
+                <button type="submit">Lưu Giao Dịch</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../CSS/NguoiDung/transaction-history-page.css"></script>
+</body>
+</html>

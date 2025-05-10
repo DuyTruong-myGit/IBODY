@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ sơ chuyên gia</title>
+  <link rel="stylesheet" href="../../CSS/chuyenGia/profile.css">
+  <link rel="stylesheet" href="../../CSS/index.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <span class="symbol">♂♀</span>
+      <span class="brand">ibody</span>
+    </div>
+    <nav class="nav">
+      <a href="indexChuyenGia.html" class="active">🏠 Trang chủ</a>
+      <a href="../chuyenGia/TongHopChuyenGia.html">📊 Quản lý thống kê</a>
+      <a href="../chuyenGia/appointments-expert.html">📅 Lịch hẹn</a>
+      <a href="../chuyenGia/clients-expert.html">👥 Khách hàng</a>
+      <a href="../chuyenGia/tin-nhan.html">💬 Tin nhắn</a>
+      <a href="../chuyenGia/profile.html">👤 Hồ sơ cá nhân</a>
+      <!-- <a href="../chuyenGia/settings-expert.html">⚙️ Cài đặt</a> -->
+      <a href="#" onclick="logout()">🚪 Đăng xuất</a>
+    </nav>
+  </header>
+
+    <div class="profile-container">
+  <div class="tab-buttons">
+    <button class="tab-btn active" data-tab="info">Thông tin hiện tại</button>
+    <button class="tab-btn" data-tab="edit">Chỉnh sửa thông tin</button>
+    <button class="tab-btn" data-tab="schedule">Thời gian rảnh</button>
+    <button class="tab-btn" data-tab="password">Đổi mật khẩu</button>
+  </div>
+
+  <div class="tab-content active" id="info">
+    <h3>Thông tin chuyên gia</h3>
+    <p><strong>Họ tên:</strong> <span id="cgFullName"></span></p>
+    <p><strong>Email:</strong> <span id="cgEmail"></span></p>
+    <p><strong>Chuyên môn:</strong> <span id="cgSpecialty"></span></p>
+    <p><strong>Số năm kinh nghiệm:</strong> <span id="cgExperience"></span></p>
+    <p><strong>Số chứng chỉ:</strong> <span id="cgCertificates"></span></p>
+    <p><strong>Giới thiệu:</strong> <span id="cgIntro"></span></p>
+  </div>
+
+  <div class="tab-content" id="edit">
+    <h3>Cập nhật thông tin</h3>
+    <form id="editForm">
+      <input type="text" id="editFullName" placeholder="Họ tên" required>
+      <input type="text" id="editSpecialty" placeholder="Chuyên môn" required>
+      <input type="number" id="editExperience" placeholder="Số năm kinh nghiệm" required>
+      <input type="text" id="editCertificates" placeholder="Số chứng chỉ" required>
+      <textarea id="editIntro" placeholder="Giới thiệu bản thân" required></textarea>
+      <button type="submit">Cập nhật</button>
+    </form>
+    <div id="editResult"></div>
+  </div>
+
+  <div class="tab-content" id="password">
+    <h3>Đổi mật khẩu</h3>
+    <form id="passwordForm">
+      <input type="password" id="oldPassword" placeholder="Mật khẩu hiện tại" required>
+      <input type="password" id="newPassword" placeholder="Mật khẩu mới" required>
+      <button type="submit">Đổi mật khẩu</button>
+    </form>
+    <div id="passwordResult"></div>
+  </div>
+
+  <div class="tab-content" id="schedule">
+  <h3>Thời gian rảnh</h3>
+  <table id="scheduleTable">
+    <thead>
+      <tr><th>Thứ</th><th>Từ</th><th>Đến</th><th>Hành động</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h4>Thêm / Sửa thời gian rảnh</h4>
+  <form id="scheduleForm">
+    <input type="hidden" id="scheduleId">
+    <select id="thuTrongTuan" required>
+      <option value="">-- Chọn thứ --</option>
+      <option value="0">Chủ nhật</option>
+      <option value="1">Thứ 2</option>
+      <option value="2">Thứ 3</option>
+      <option value="3">Thứ 4</option>
+      <option value="4">Thứ 5</option>
+      <option value="5">Thứ 6</option>
+      <option value="6">Thứ 7</option>
+    </select>
+    <input type="time" id="tu" required>
+    <input type="time" id="den" required>
+    <button type="submit">Lưu</button>
+    <button type="button" onclick="resetScheduleForm()">Huỷ</button>
+  </form>
+</div>
+
+</div>
+
+
+  <!-- footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-about">
+        <h3>Về chúng tôi</h3>
+        <p>
+            IBODY là một dự án nhằm kết nối học sinh với các chuyên gia tâm lý đáng tin cậy, hỗ trợ tư vấn những vấn đề tâm lý, sinh lý và tình dục mà các em còn ngần ngại chia sẻ với phụ huynh.
+            Chúng tôi mang đến không gian an toàn, thông tin chính xác và sự đồng hành chuyên nghiệp để giúp học sinh thấu hiểu bản thân, vượt qua lo lắng và phát triển một cách lành mạnh.
+        </p>
+      </div>
+      <div class="footer-contact">
+        <h4>Liên hệ</h4>
+        <p>Email: duytruongk22@gmail.com</p>
+        <p>Hotline: 0889 225 315</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 ibody. All rights reserved.</p>
+    </div>
+  </footer>
+
+
+  <script src="../../JS/chuyenGia/proflie.js"></script>
+</body>
+</html>

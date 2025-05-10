@@ -1,3 +1,17 @@
+window.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+
+  if (user.roles && user.roles.includes("chuyen_gia")) {
+    window.location.href = "../HTML/chuyengia/indexChuyenGia.html";
+    return;
+  }
+
+
+});
+
+
+
 const modal = document.getElementById('authModal');
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
@@ -125,15 +139,19 @@ loginForm.addEventListener("submit", async (event) => {
 
       // Kiểm tra quyền và chuyển hướng
       console.log("→ Chuẩn bị redirect... user.roles = ", user.roles);
-
       if (Array.isArray(user.roles)) {
         if (user.roles.includes("quan_tri")) {
-          console.log("✅ Quyền admin xác thực → chuyển trang!");
+          console.log("✅ Quyền admin xác thực → chuyển trang admin");
           setTimeout(() => {
-            window.location.replace("admin-dashboard.html");
+            window.location.replace("../HTML/Admin/admin-dashboard.html");
+          }, 100);
+        } else if (user.roles.includes("chuyen_gia")) {
+          console.log("✅ Quyền chuyên gia xác thực → chuyển trang chuyên gia");
+          setTimeout(() => {
+            window.location.replace("../HTML/chuyenGia/IndexChuyenGia.html");
           }, 100);
         } else {
-          console.log("👤 Quyền người dùng → về index");
+          console.log("👤 Quyền người dùng thông thường → về trang chủ");
           window.location.replace("index.html");
         }
       }
@@ -168,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function logout() {
   localStorage.removeItem("user");
   alert("Đăng xuất thành công!");
-  window.location.href = "index.html";
+  window.location.href = "./index.html";
 }
 
 
@@ -185,4 +203,15 @@ document.addEventListener("click", function (e) {
   if (!menu.contains(e.target)) {
     dropdown.classList.remove("show");
   }
+});
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("menu-toggle");
+  const nav = document.querySelector(".nav");
+
+  toggleBtn?.addEventListener("click", () => {
+    nav.classList.toggle("open");
+  });
 });

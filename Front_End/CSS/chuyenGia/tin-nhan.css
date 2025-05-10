@@ -1,0 +1,151 @@
+/* tin-nhan.css - Giao diện chat cho chuyên gia */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 300px;
+  background-color: #fff;
+  border-right: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+#searchInput {
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.chat-item:hover,
+.chat-item.active {
+  background-color: #e6f7ff;
+}
+
+.chat-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.chat-item h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.chat-item p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: gray;
+}
+
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  background-color: #0084ff;
+  color: white;
+  padding: 10px;
+}
+
+.chat-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.messages {
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+}
+
+.message-item {
+  margin: 10px 0;
+  max-width: 70%;
+  padding: 10px;
+  border-radius: 10px;
+  position: relative;
+  word-break: break-word;
+}
+
+.message-item.me {
+  background-color: #d2f8d2;
+  margin-left: auto;
+  text-align: right;
+}
+
+.message-item.friend {
+  background-color: #fff;
+}
+
+.message-item p {
+  margin: 0;
+}
+
+.message-item span {
+  display: block;
+  font-size: 10px;
+  color: gray;
+  margin-top: 5px;
+}
+
+.chat-footer {
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+}
+
+#message-input {
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+  resize: none;
+  width: 100%;
+}
+
+#typing-text {
+  margin-top: 5px;
+  font-size: 12px;
+  color: gray;
+}

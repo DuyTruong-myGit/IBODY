@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý Tố cáo</title>
+  <link rel="stylesheet" href="../../CSS/index.css" />
+  <link rel="stylesheet" href="../../CSS/admin.css" />
+</head>
+<body>
+  <header class="admin-header">
+    <h2>Trang Quản Trị</h2>
+    <nav>
+        <a href="admin-dashboard.html">Tổng quan</a>
+        <a href="admin-users.html">Tài khoản</a>
+        <a href="admin-duyet-chuyen-gia.html">Duyệt chuyên gia</a>
+        <a href="admin-reports.html" class="active">Tố cáo</a>
+        <a href="admin-lichhen.html">Lịch hẹn</a>
+        <a href="admin-danhgia.html">Đánh giá</a>
+        <a href="adminHoaDon.html">Hóa đơn</a>
+        <a href="adminPhuongThuc.html" >Phương thức</a>
+        <a href="#" id="logoutLink" style="color: red;">Đăng xuất</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-container">
+    <h3>Danh sách tố cáo người dùng</h3>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Người báo cáo</th>
+          <th>Người bị tố cáo</th>
+          <th>Lý do</th>
+          <th>Thời gian</th>
+        </tr>
+      </thead>
+      <tbody id="reportTableBody">
+        <!-- dữ liệu tố cáo sẽ hiển thị ở đây -->
+      </tbody>
+    </table>
+  </main>
+
+  <script src="../../JS/Admin/admin-reports.js"></script>
+</body>
+</html>

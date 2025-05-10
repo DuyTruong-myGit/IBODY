@@ -1,0 +1,163 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f5f7fa;
+  height: 100%;
+}
+
+/* Container chính */
+.payment-method-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Tiêu đề */
+h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Nút quay lại */
+.btn-go-back {
+  background: #dee2e6;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+}
+
+.btn-go-back:hover {
+  background: #ced4da;
+}
+
+/* Bố cục 2 cột đều chiều cao */
+.payment-wrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+/* Panel trái & phải */
+.left-panel,
+.right-panel {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tiêu đề mỗi khung */
+.left-panel h3,
+.right-panel h3 {
+  color: #0d6efd;
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+}
+
+/* Label & Input */
+label {
+  display: block;
+  margin-top: 0.8rem;
+  font-weight: bold;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  font-size: 0.95rem;
+}
+
+textarea {
+  height: 100px;
+  resize: none;
+}
+
+/* Nút xác nhận */
+.payment-confirm {
+  margin-top: auto;
+  text-align: center;
+}
+
+.btn-primary {
+  background: #0d6efd;
+  color: white;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: #0b5ed7;
+}
+
+/* Card chuyên gia & khóa khám */
+.info-card {
+  background: #e2e6ea;
+  padding: 0.9rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.info-card h4 {
+  color: #0d6efd;
+  font-size: 1rem;
+}
+
+.info-card p {
+  color: #555;
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+}
+
+/* QR code nhỏ gọn */
+.qr-code-section img,
+#qrCode {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  display: block;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel,
+  .right-panel {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+}
