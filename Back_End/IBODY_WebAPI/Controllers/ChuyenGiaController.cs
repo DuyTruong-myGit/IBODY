@@ -163,6 +163,49 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
+
+        [HttpGet("khach-hang-tu-van/{chuyenGiaId}")]
+        public async Task<IActionResult> GetKhachHangTungTuVan(int chuyenGiaId)
+        {
+            // Lấy danh sách lịch hẹn đã thanh toán hoặc đã diễn ra
+            var lichHenList = await _context.LichHens
+                .Include(lh => lh.NguoiDung).ThenInclude(nd => nd.TaiKhoan)
+                .Include(lh => lh.HinhThuc)
+                .Where(lh => lh.ChuyenGiaId == chuyenGiaId 
+                        && (lh.TrangThai == "da_thanh_toan" || lh.TrangThai == "da_dien_ra"))
+                .Select(lh => new
+                {
+                    LichHenId = lh.Id,
+                    HoTenKhachHang = lh.NguoiDung.HoTen,
+                    Email = lh.NguoiDung.TaiKhoan.Email,
+                    TaiKhoanIdNguoiDung = lh.NguoiDung.TaiKhoan.Id, 
+                    Ngay = lh.ThoiGianBatDau.Value.Date,
+                    GioBatDau = lh.ThoiGianBatDau,
+                    GioKetThuc = lh.ThoiGianKetThuc,
+                    TomTat = lh.TomTat,
+                    HinhThuc = lh.HinhThuc.Ten,
+                    TrangThai = lh.TrangThai
+                })
+                .OrderByDescending(lh => lh.GioBatDau)
+                .ToListAsync();
+
+            return Ok(lichHenList);
+        }
+
+        [HttpGet("thongTin/{taiKhoanId}")]
+        public async Task<IActionResult> GetThongTinTheoTaiKhoan(int taiKhoanId)
+        {
+            var chuyenGia = await _context.ChuyenGia
+                .FirstOrDefaultAsync(cg => cg.TaiKhoanId == taiKhoanId);
+
+            if (chuyenGia == null)
+                return NotFound();
+
+            return Ok(chuyenGia);
+        }
+
+
+
     }
 
 

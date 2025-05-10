@@ -55,7 +55,7 @@ namespace IBODY_WebAPI.Controllers
                 ThoiGianBatDau = dto.ThoiGianBatDau,
                 ThoiGianKetThuc = dto.ThoiGianKetThuc,
                 TomTat = dto.TomTat,
-                TrangThai = "cho_thanh_toan"
+                TrangThai = "cho_duyet"
             };
 
             _context.LichHens.Add(lichHen);
@@ -63,7 +63,7 @@ namespace IBODY_WebAPI.Controllers
             
             var hinhThuc = await _context.HinhThucTuVans.FindAsync(dto.HinhThucId);
 
-            return Ok(new { message = "Đặt lịch thành công!" , tongTien = hinhThuc?.GiaCoBan ?? 0});
+            return Ok(new { message = "Đặt lịch thành công!" , tongTien = hinhThuc?.GiaCoBan ?? 0 ,lichHenId = lichHen.Id});
         }
 
 

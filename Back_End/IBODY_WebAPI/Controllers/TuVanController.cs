@@ -99,7 +99,7 @@ namespace IBODY_WebAPI.Controllers
             });
         }
 
-        [HttpGet("avgDanhGia/{id}")]
+        [HttpGet("avgDanhGia/{chuyenGiaId}")]
         public async Task<IActionResult> ThongKeDanhGia(int chuyenGiaId)
         {
             var danhGias = await _context.DanhGia

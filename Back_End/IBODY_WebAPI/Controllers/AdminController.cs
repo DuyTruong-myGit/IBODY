@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 namespace IBODY_WebAPI.Controllers
 {
     [AllowAnonymous]
-   //[Authorize(Roles = "quan_tri")]
+    //[Authorize(Roles = "quan_tri")]
     [ApiController]
     [Route("api/admin")]
     public class AdminController : ControllerBase
@@ -137,11 +137,22 @@ namespace IBODY_WebAPI.Controllers
             {
                 account.VaiTro = "chuyen_gia";
 
-                // ✅ Xóa bản ghi người dùng nếu có
+                // Xóa bản ghi người dùng nếu có (nâng cấp)
                 var nguoiDung = await _context.NguoiDungs
-                    .FirstOrDefaultAsync(nd => nd.TaiKhoanId == expert.TaiKhoanId);
+                    .FirstOrDefaultAsync(nd => nd.TaiKhoanId == account.Id);
                 if (nguoiDung != null)
                     _context.NguoiDungs.Remove(nguoiDung);
+
+                // ✅ Thêm vai trò "chuyen_gia" trong Identity nếu chưa có
+                var identityUser = await _userManager.FindByEmailAsync(account.Email);
+                if (identityUser != null)
+                {
+                    var roles = await _userManager.GetRolesAsync(identityUser);
+                    if (!roles.Contains("chuyen_gia"))
+                    {
+                        await _userManager.AddToRoleAsync(identityUser, "chuyen_gia");
+                    }
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -150,22 +161,38 @@ namespace IBODY_WebAPI.Controllers
 
 
 
+
         [HttpPost("expert-reject/{id}")]
         public async Task<IActionResult> RejectExpert(int id)
         {
-        var expert = await _context.ChuyenGia.FindAsync(id);
-        if (expert == null)
-            return NotFound(new { message = "Không tìm thấy chuyên gia." });
+            var expert = await _context.ChuyenGia.FindAsync(id);
+            if (expert == null)
+                return NotFound(new { message = "Không tìm thấy chuyên gia." });
 
-        if (expert.TrangThai != "cho_duyet")
-        {
-            return BadRequest(new { message = "Chuyên gia đã được xử lý. Không thể từ chối nữa." });
-        }
-        expert.TrangThai = "tu_choi";
-        await _context.SaveChangesAsync();
+            if (expert.TrangThai != "cho_duyet")
+                return BadRequest(new { message = "Chuyên gia đã được xử lý. Không thể từ chối nữa." });
 
-        return Ok(new { message = "Đã từ chối yêu cầu nâng cấp." });
-        }
+            expert.TrangThai = "tu_choi";
+
+            // ✅ Xoá role "chuyen_gia" khỏi hệ thống Identity nếu có
+            var taiKhoan = await _context.TaiKhoans.FindAsync(expert.TaiKhoanId);
+            if (taiKhoan != null)
+            {
+                var identityUser = await _userManager.FindByEmailAsync(taiKhoan.Email);
+                if (identityUser != null)
+                {
+                    var roles = await _userManager.GetRolesAsync(identityUser);
+                    if (roles.Contains("chuyen_gia"))
+                    {
+                        await _userManager.RemoveFromRoleAsync(identityUser, "chuyen_gia");
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã từ chối yêu cầu nâng cấp." });
+        }   
+
 
         // hiển thị toàn bộ lịch hẹn đang có trên hệ thống
         [HttpGet("lich-hen")]
@@ -211,10 +238,10 @@ namespace IBODY_WebAPI.Controllers
             var lich = await _context.LichHens.FindAsync(id);
             if (lich == null)
                 return NotFound(new { message = "Không tìm thấy lịch hẹn." });
-            if (lich.TrangThai == "da_thanh_toan" || lich.TrangThai == "da_dien_ra")
-            {
-                return BadRequest(new { message = "Lịch đã thanh toán hoặc đã kết thúc, không thể chỉnh sửa." });
-            }
+            // if (lich.TrangThai == "da_thanh_toan" || lich.TrangThai == "da_dien_ra")
+            // {
+            //     return BadRequest(new { message = "Lịch đã thanh toán hoặc đã kết thúc, không thể chỉnh sửa." });
+            // }
             lich.ThoiGianBatDau = dto.ThoiGianBatDau;
             lich.ThoiGianKetThuc = dto.ThoiGianKetThuc;
             lich.TomTat = dto.TomTat;

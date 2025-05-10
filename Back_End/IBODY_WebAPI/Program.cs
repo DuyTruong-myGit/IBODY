@@ -69,11 +69,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors();
 
-// app.UseAuthentication();
-// app.UseAuthorization();
+// Nếu có dùng Authentication/Authorization thì mở lại
+ app.UseAuthentication();
+ app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();

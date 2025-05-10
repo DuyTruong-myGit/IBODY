@@ -29,6 +29,7 @@ namespace IBODY_WebAPI.Controllers
 
             return Ok(new
             {
+                id = user.Id,
                 email = account?.Email,
                 hoTen = user.HoTen,
                 ngaySinh = user.NgaySinh,
@@ -58,22 +59,32 @@ namespace IBODY_WebAPI.Controllers
         [HttpPut("change-password/{accountId}")]
         public async Task<IActionResult> ChangePassword(int accountId, [FromBody] ChangePasswordDto dto)
         {
-            var account = await _context.TaiKhoans.FindAsync(accountId);
-            if (account == null)
-                return NotFound(new { message = "Không tìm thấy tài khoản." });
-
-            // Kiểm tra mật khẩu hiện tại có đúng không
-            if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, account.MatKhau))
+            try
             {
-                return BadRequest(new { message = "Mật khẩu hiện tại không đúng." });
+                var account = await _context.TaiKhoans.FindAsync(accountId);
+                if (account == null)
+                    return NotFound(new { message = "Không tìm thấy tài khoản." });
+
+                if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, account.MatKhau))
+                    return BadRequest(new { message = "Mật khẩu hiện tại không đúng." });
+                    Console.WriteLine("Stored hash: " + account.MatKhau);
+
+
+                account.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Đổi mật khẩu thành công." });
             }
-
-            // Gán mật khẩu mới (đã mã hoá)
-            account.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Đổi mật khẩu thành công." });
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Đã xảy ra lỗi trong quá trình đổi mật khẩu.",
+                    error = ex.Message
+                });
+            }
         }
+
 
         
             //Đánh giá chuyên gia chỉ sau khi kết thúc lịch hẹn
@@ -112,42 +123,53 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { message = "Đã gửi đánh giá!" });
         }
 
-        // THỰC HIỆN THANH TOÁN LỊCH HẸN
         [HttpPost("thanh-toan-lich-hen")]
         public async Task<IActionResult> ThanhToanLichHen([FromBody] ThanhToanDto dto)
         {
-            var lichHen = await _context.LichHens.FindAsync(dto.LichHenId);
-            Console.WriteLine($"➡️ LichHenId: {dto.LichHenId}, TaiKhoanId: {dto.TaiKhoanId}, SoTien: {dto.SoTien}");
-            if (lichHen == null || lichHen.TrangThai != "cho_thanh_toan")
-                return BadRequest("Lịch hẹn không hợp lệ hoặc đã thanh toán.");
-            if (lichHen.ThoiGianBatDau < DateTime.Now)
-                return BadRequest("Lịch hẹn đã diễn ra, không thể thanh toán.");
-            var hoaDon = new HoaDon
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                TaiKhoanId = dto.TaiKhoanId,
-                GoiDichVuId = null,
-                TongTien = dto.SoTien,
-                ThoiGianTao = DateTime.Now
-            };
-            _context.HoaDons.Add(hoaDon);
-            await _context.SaveChangesAsync();
+                var lichHen = await _context.LichHens.FindAsync(dto.LichHenId);
+                if (lichHen == null || lichHen.TrangThai != "cho_thanh_toan")
+                    return BadRequest("Lịch hẹn không hợp lệ hoặc đã thanh toán.");
+                
+                if (lichHen.ThoiGianBatDau < DateTime.Now)
+                    return BadRequest("Lịch hẹn đã diễn ra, không thể thanh toán.");
 
-            var giaoDich = new GiaoDich
+                var hoaDon = new HoaDon
+                {
+                    TaiKhoanId = dto.TaiKhoanId,
+                    GoiDichVuId = null,
+                    TongTien = dto.SoTien,
+                    ThoiGianTao = DateTime.Now
+                };
+                _context.HoaDons.Add(hoaDon);
+                await _context.SaveChangesAsync();
+
+                var giaoDich = new GiaoDich
+                {
+                    HoaDonId = hoaDon.Id,
+                    PhuongThucId = dto.PhuongThucId,
+                    SoTien = dto.SoTien,
+                    ThoiGian = DateTime.Now
+                };
+                _context.GiaoDiches.Add(giaoDich);
+
+                // Cập nhật trạng thái lịch hẹn
+                lichHen.TrangThai = "da_thanh_toan";
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return Ok(new { message = "Thanh toán thành công!" });
+            }
+            catch (Exception ex)
             {
-                HoaDonId = hoaDon.Id,
-                PhuongThucId = dto.PhuongThucId,
-                SoTien = dto.SoTien,
-                ThoiGian = DateTime.Now
-            };
-            _context.GiaoDiches.Add(giaoDich);
-
-            // Cập nhật trạng thái lịch hẹn
-            lichHen.TrangThai = "da_thanh_toan";
-
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "Thanh toán thành công!" });
+                await transaction.RollbackAsync();
+                Console.WriteLine($"❌ Error: {ex.Message}");
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi thanh toán. Vui lòng thử lại sau." });
+            }
         }
-        
+
 
         [HttpPost("guiTinNhan")]
         public async Task<IActionResult> GuiTinNhan([FromBody] GuiTinNhanDto dto)
@@ -222,6 +244,47 @@ namespace IBODY_WebAPI.Controllers
                 .ToListAsync();
 
             return Ok(lichSu);
+        }
+
+
+        [HttpGet("danhSachChuyenGiaKetNoi/{taiKhoanId}")]
+        public async Task<IActionResult> GetConnectedExperts(int taiKhoanId)
+        {
+            // Lấy danh sách tin nhắn có liên quan đến người dùng này
+            var chuyenGiaIds = await _context.TinNhans
+                .Where(t => t.NguoiGuiId == taiKhoanId || t.NguoiNhanId == taiKhoanId)
+                .Select(t => t.NguoiGuiId == taiKhoanId ? t.NguoiNhanId : t.NguoiGuiId)
+                .Distinct()
+                .ToListAsync();
+
+            var chuyenGiaList = await _context.ChuyenGia
+                .Include(cg => cg.TaiKhoan)
+                .Where(cg => chuyenGiaIds.Contains(cg.TaiKhoanId))
+                .Select(cg => new
+                {
+                    cg.Id,
+                    HoTen = cg.HoTen,
+                    Email = cg.TaiKhoan.Email,
+                    cg.TaiKhoanId
+                })
+                .ToListAsync();
+
+            return Ok(chuyenGiaList);
+        }
+
+        
+        [HttpGet("phuong-thuc-thanh-toan")]
+        public async Task<IActionResult> GetPhuongThucThanhToan()
+        {
+            var list = await _context.PhuongThucChungs
+                .Where(p => p.TrangThai == "hien")
+                .Select(p => new {
+                    p.Id,
+                    p.Ten
+                })
+                .ToListAsync();
+
+            return Ok(list);
         }
 
 

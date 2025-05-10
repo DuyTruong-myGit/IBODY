@@ -24,7 +24,7 @@ namespace IBODY_WebAPI.Controllers
                 return Forbid("Tài khoản của bạn đã bị khóa.");
             
             var lich = await _context.LichHens
-                .Where(lh => lh.ChuyenGiaId == chuyenGiaId && lh.TrangThai == "da_thanh_toan")
+                .Where(lh => lh.ChuyenGiaId == chuyenGiaId && (lh.TrangThai == "cho_duyet" || lh.TrangThai == "da_thanh_toan"))
                 .Include(lh => lh.NguoiDung)
                 .Include(lh => lh.HinhThuc)
                 .Select(lh => new
@@ -71,6 +71,32 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { message = "Chuyên gia đã hủy lịch hẹn thành công." });
         }
 
+
+
+
+        [HttpPost("duyet-lich/{lichHenId}")]
+        public async Task<IActionResult> DuyetLichHen(int lichHenId)
+        {
+            var lich = await _context.LichHens.FindAsync(lichHenId);
+            if (lich == null || lich.TrangThai != "cho_duyet")
+                return BadRequest("Lịch không hợp lệ.");
+
+            lich.TrangThai = "cho_thanh_toan";
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã duyệt lịch, chờ thanh toán." });
+        }
+
+        [HttpPost("tu-choi-lich/{lichHenId}")]
+        public async Task<IActionResult> TuChoiLichHen(int lichHenId)
+        {
+            var lich = await _context.LichHens.FindAsync(lichHenId);
+            if (lich == null || lich.TrangThai != "cho_duyet")
+                return BadRequest("Lịch không hợp lệ.");
+
+            lich.TrangThai = "da_huy";
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã từ chối lịch." });
+        }
 
 
     }
