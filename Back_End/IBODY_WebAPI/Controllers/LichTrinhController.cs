@@ -23,15 +23,6 @@ namespace IBODY_WebAPI.Controllers
                 .Include(lh => lh.HinhThuc)
                 .ToListAsync();
 
-        // ✅ Tự động cập nhật trạng thái
-        foreach (var l in lichGoc)
-        {
-            if (l.TrangThai == "da_thanh_toan" && l.ThoiGianKetThuc < DateTime.Now)
-            {
-                l.TrangThai = "da_dien_ra";
-            }
-        }
-
         await _context.SaveChangesAsync();
         var lich = lichGoc
             .OrderBy(l => l.ThoiGianBatDau)
@@ -67,7 +58,7 @@ namespace IBODY_WebAPI.Controllers
             if (lich == null)
                 return NotFound(new { message = "Lịch hẹn không tồn tại." });
 
-            if (lich.TrangThai == "da_thanh_toan")
+            if (lich.TrangThai == "da_dien_ra")
                 return BadRequest(new { message = "Lịch đã thanh toán, không thể hủy." });
            
             _context.LichHens.Remove(lich);

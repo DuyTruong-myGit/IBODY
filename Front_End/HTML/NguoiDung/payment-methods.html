@@ -38,30 +38,30 @@
             </div>
         </nav>
     </header>
+ <div class="payment-container">
+    <h1>Thanh toán gói dịch vụ</h1>
 
-<div class="payment-method-container">
-    <h2>Thanh toán lịch hẹn</h2>
-    <div class="payment-wrapper">
-      <!-- Thông tin lịch hẹn -->
-      <div class="left-panel">
-        <form id="paymentForm">
-          <label for="paymentMethod">Chọn phương thức thanh toán:</label>
-          <select id="paymentMethod" required>
-            <option value="">-- Chọn phương thức --</option>
-          </select>
-
-          <div class="payment-confirm">
-            <button type="submit" class="btn-primary">Xác nhận thanh toán</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Thông tin chuyên gia và lịch -->
-      <div class="right-panel">
-        <h3>Thông tin lịch hẹn</h3>
-        <div class="info-card" id="lichHenInfo"></div>
-      </div>
+    <!-- Thông tin người dùng -->
+    <div class="info-card">
+      <h3>Thông tin người dùng</h3>
+      <p><strong>Họ tên:</strong> <span id="userFullName">...</span></p>
+      <p><strong>Email:</strong> <span id="userEmail">...</span></p>
     </div>
+
+    <!-- Thông tin gói -->
+    <div class="info-card">
+      <h3>Thông tin gói</h3>
+      <p><strong>Tên gói:</strong> <span id="goiTen">...</span></p>
+      <p><strong>Mô tả:</strong> <span id="goiMoTa">...</span></p>
+      <p><strong>Giá:</strong> <span id="goiGia">...</span></p>
+      <p><strong>Thời hạn:</strong> <span id="goiThoiHan">...</span></p>
+    </div>
+
+    <!-- Form xác nhận -->
+    <form id="paymentForm">
+      <h3>Xác nhận thanh toán</h3>
+      <button type="submit" class="pay-btn">Xác nhận & Thanh toán</button>
+    </form>
   </div>
     <!-- footer -->
     <footer class="footer">

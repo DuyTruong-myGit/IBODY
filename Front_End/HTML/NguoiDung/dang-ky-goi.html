@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hỗ trợ người dùng</title>
-  <link rel="stylesheet" href="../../CSS/NguoiDung/hoTroUser.css">
+  <title>Quản lý gói dịch vụ</title>
+  <link rel="stylesheet" href="../../CSS/NguoiDung/dang-ky-goi.css">
   <link rel="stylesheet" href="../../CSS/index.css">
 </head>
 <body>
@@ -39,26 +39,14 @@
     </nav>
   </header>
 
-  <div class="support-container">
+  <div class="goi-container">
+    <h2>Gói dịch vụ của bạn</h2>
+    <div id="goiHienTai"></div>
 
-    <h1>Gửi yêu cầu hỗ trợ</h1>
-    <p class="description">Nếu bạn gặp sự cố hoặc có thắc mắc, hãy gửi nội dung bên dưới. Chúng tôi sẽ phản hồi trong thời gian sớm nhất.</p>
-
-    <form id="supportForm">
-      <div class="form-group">
-        <label for="supportTopic">Chủ đề:</label>
-        <input type="text" id="supportTopic" required placeholder="Ví dụ: Không thể đặt lịch">
-      </div>
-
-      <div class="form-group">
-        <label for="supportContent">Nội dung yêu cầu:</label>
-        <textarea id="supportContent" rows="6" required placeholder="Mô tả vấn đề bạn gặp phải hoặc nội dung cần hỗ trợ..."></textarea>
-      </div>
-
-      <button type="submit" class="btn-submit">Gửi yêu cầu</button>
-    </form>
+    <h2>Danh sách gói có thể đăng ký</h2>
+    <div id="goiList" class="goi-list"></div>
   </div>
-
-  <script src="../../JS/NguoiDung/ho-tro-user.js"></script>
+  
+  <script src="../../JS/NguoiDung/dang-ky-goi.js"></script>
 </body>
 </html>

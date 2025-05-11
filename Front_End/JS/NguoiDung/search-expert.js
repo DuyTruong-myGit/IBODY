@@ -1,6 +1,11 @@
 // =================== ÁP DỤNG LOGIC MENU GIỐNG TRANG INDEX ===================
 document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user){
+    alert("Vui lòng đăng nhập để tiếp tục.");
+    return window.location.href = "../index.html";} 
+    
   const loginLink = document.getElementById("loginLink");
   const userMenu = document.getElementById("userMenu");
   const usernameDisplay = document.getElementById("usernameDisplay");
@@ -86,3 +91,14 @@ async function loadExperts(keyword = "") {
 function viewExpertDetail(id) {
   window.location.href = `profile-expert.html?id=${id}`;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const avatarImg = document.querySelector(".user-button img");
+
+  if (user && avatarImg) {
+    avatarImg.src = user.avatarUrl
+      ? `http://localhost:5221${user.avatarUrl}`
+      : "../img/default-avatar.png";
+  }
+});

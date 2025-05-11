@@ -24,6 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
 
       if (res.ok) {
+        console.log("avatarUrl từ API:", data.avatarUrl);
+
         document.getElementById("infoHoTen").innerText = data.hoTen || "N/A";
         document.getElementById("infoEmail").innerText = data.email || "N/A";
         document.getElementById("infoGioiTinh").innerText = data.gioiTinh || "N/A";
@@ -31,6 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
           ? new Date(data.ngaySinh).toLocaleDateString()
           : "N/A";
         document.getElementById("infoMucTieu").innerText = data.mucTieuTamLy || "N/A";
+
+        // ✅ Hiển thị avatar trong thông tin
+        document.getElementById("currentAvatar").src = data.avatarUrl
+          ? `http://localhost:5221${data.avatarUrl}`
+          : "../img/default-avatar.png";
+
+        // ✅ Cập nhật avatar ở menu nếu có
+        const avatarMenu = document.querySelector(".user-button img");
+        if (avatarMenu && data.avatarUrl) {
+          avatarMenu.src = `http://localhost:5221${data.avatarUrl}`;
+        }
       } else {
         alert(data.message || "Không tải được thông tin.");
       }
@@ -41,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadThongTinCaNhan();
-
 
   // ====== 3. Cập nhật thông tin người dùng ======
   const updateForm = document.getElementById("updateInfoForm");
@@ -76,85 +88,79 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ====== 4. Đổi mật khẩu ======
-  const changePasswordForm = document.getElementById("changePasswordForm");
-  if (changePasswordForm) {
-    changePasswordForm.addEventListener("submit", async (e) => {
+  // ====== 4. Upload avatar (form riêng) ======
+  const avatarForm = document.getElementById("avatarUploadForm");
+  if (avatarForm) {
+    avatarForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const current = document.getElementById("currentPassword").value;
-      const newPw = document.getElementById("newPassword").value;
-      const confirm = document.getElementById("confirmNewPassword").value;
+      const fileInput = document.getElementById("avatarFile");
+      if (!fileInput || !fileInput.files.length) return;
 
-      if (newPw !== confirm) return alert("Mật khẩu mới không khớp.");
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
 
       try {
-        const res = await fetch(`http://localhost:5221/api/user/change-password/${user.taiKhoanId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            currentPassword: current,
-            newPassword: newPw,
-          }),
+        const res = await fetch(`http://localhost:5221/api/user/upload-avatar/${user.taiKhoanId}`, {
+          method: "POST",
+          body: formData
         });
 
-        const text = await res.text();
-        try {
-          const data = JSON.parse(text);
-          if (res.ok) {
-            alert(data.message || "Đổi mật khẩu thành công.");
-          } else {
-            alert(data.message || "Đổi mật khẩu thất bại.");
-          }
-        } catch (e) {
-          console.error("Phản hồi không hợp lệ JSON:", text);
-          alert("Lỗi máy chủ: phản hồi không hợp lệ.");
+        const result = await res.json();
+        if (res.ok) {
+          alert("Tải lên avatar thành công!");
+          document.getElementById("currentAvatar").src = `http://localhost:5221${result.avatarUrl}`;
+          user.avatarUrl = result.avatarUrl;
+          localStorage.setItem("user", JSON.stringify(user));
+          await loadThongTinCaNhan();
+        } else {
+          alert(result.message || "Tải lên thất bại.");
         }
       } catch (err) {
-        console.error("Lỗi mạng:", err);
-        alert("Không thể kết nối đến máy chủ.");
+        console.error(err);
+        alert("Lỗi kết nối khi tải lên avatar.");
       }
     });
   }
 
-  // ====== 5. Tải lịch sử tư vấn ======
-  async function loadLichSuTuVan() {
-    const container = document.getElementById("lichSuTuVanList");
-    if (!container) return;
+  // ====== 5. Lịch sử tư vấn ======
+async function loadLichSuTuVan() {
+  const container = document.getElementById("lichSuTuVanList");
+  if (!container) return;
 
-    container.innerHTML = "<p>Đang tải dữ liệu...</p>";
+  container.innerHTML = "<p>Đang tải dữ liệu...</p>";
 
-    try {
-      const res = await fetch(`http://localhost:5221/api/user/lichSuTuVan/${user.taiKhoanId}`);
-      const data = await res.json();
+  try {
+    const res = await fetch(`http://localhost:5221/api/user/lichSuTuVan/${user.taiKhoanId}`);
+    const data = await res.json();
 
-      if (res.ok && data.length > 0) {
-        container.innerHTML = data
-          .map(
-            (item) => `
-            <div class="lich-tu-van-item">
-              <h4>Chuyên gia: ${item.chuyenGia}</h4>
-              <p>📅 ${new Date(item.thoiGianBatDau).toLocaleDateString()} – ⏰ ${new Date(item.thoiGianBatDau).toLocaleTimeString()} → ${new Date(item.thoiGianKetThuc).toLocaleTimeString()}</p>
-              <p>💬 ${item.tomTat}</p>
-              <p>💰 ${item.tongTien.toLocaleString()}đ | 🧾 Hóa đơn #${item.hoaDonId} | Thanh toán: ${new Date(item.thoiGianThanhToan).toLocaleString()}</p>
-            </div>
-          `
-          )
-          .join("");
-      } else {
-        container.innerHTML = "<p>Chưa có lịch sử tư vấn nào.</p>";
-      }
-    } catch (err) {
-      console.error(err);
-      container.innerHTML = "<p>Lỗi khi tải lịch sử tư vấn.</p>";
+    if (res.ok && data.length > 0) {
+      container.innerHTML = data
+        .map(
+          (item) => `
+          <div class="lich-tu-van-item">
+            <h4>👨‍⚕️ Chuyên gia: ${item.chuyenGia}</h4>
+            <p>📅 Ngày: ${new Date(item.thoiGianBatDau).toLocaleDateString()}</p>
+            <p>🕓 Giờ: ${new Date(item.thoiGianBatDau).toLocaleTimeString()} → ${new Date(item.thoiGianKetThuc).toLocaleTimeString()}</p>
+            <p>💬 Tóm tắt: ${item.tomTat || "Không có"}</p>
+            <p>📞 Hình thức: ${item.ten}</p>
+          </div>
+        `
+        )
+        .join("");
+    } else {
+      container.innerHTML = "<p>Chưa có lịch sử tư vấn nào.</p>";
     }
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Lỗi khi tải lịch sử tư vấn.</p>";
   }
+}
+
 
   loadLichSuTuVan();
 
-  // ====== 6. Chuyển tab giao diện ======
+  // ====== 6. Chuyển tab ======
   const tabs = document.querySelectorAll(".tab-btn");
   const contents = document.querySelectorAll(".tab-content");
 
@@ -169,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ====== 7. Logout & dropdown user menu ======
+  // ====== 7. Đăng xuất & dropdown menu ======
   window.logout = function () {
     localStorage.removeItem("user");
     alert("Đăng xuất thành công!");

@@ -445,44 +445,28 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
-        [HttpGet("hoaDonPhiaChuyenGia")]
-        public async Task<IActionResult> GetAllHoaDon()
+       
+        [HttpGet("thong-ke-luong-chuyen-gia")]
+        public async Task<IActionResult> TinhLuongChuyenGia(int thang, int nam, decimal luongMotBuoi = 100000)
         {
-            var list = await _context.HoaDons
-                .Include(h => h.TaiKhoan)
-                .Select(h => new
+            var lichHen = await _context.LichHens
+                .Where(lh => lh.TrangThai == "da_dien_ra"
+                          && lh.ThoiGianKetThuc.HasValue
+                          && lh.ThoiGianKetThuc.Value.Month == thang
+                          && lh.ThoiGianKetThuc.Value.Year == nam)
+                .GroupBy(lh => lh.ChuyenGiaId)
+                .Select(g => new
                 {
-                    h.Id,
-                    Email = h.TaiKhoan.Email,
-                    h.TongTien,
-                    h.ThoiGianTao
+                    chuyenGiaId = g.Key,
+                    soBuoi = g.Count(),
+                    luongMotBuoi,
+                    tongLuong = g.Count() * luongMotBuoi
                 })
-                .OrderByDescending(h => h.ThoiGianTao)
                 .ToListAsync();
 
-            return Ok(list);
+            return Ok(lichHen);
         }
-
-
-        [HttpDelete("huyHoaDon/{id}")]
-        public async Task<IActionResult> DeleteHoaDon(int id)
-        {
-            var hoaDon = await _context.HoaDons.FindAsync(id);
-            if (hoaDon == null)
-                return NotFound(new { message = "Không tìm thấy hóa đơn." });
-
-            // Cũng xoá các giao dịch liên quan nếu có
-            var giaoDich = await _context.GiaoDiches
-                .Where(g => g.HoaDonId == hoaDon.Id)
-                .ToListAsync();
-
-            _context.GiaoDiches.RemoveRange(giaoDich);
-            _context.HoaDons.Remove(hoaDon);
-
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "Đã xóa hóa đơn và các giao dịch liên quan." });
-        }
-
+       
         // Lấy danh sách đánh giá của chuyên gia
         [HttpGet("danhGiaCuaChuyenGia")]
         public async Task<IActionResult> GetAllDanhGiaChuyenGia()

@@ -1,8 +1,36 @@
-const user = JSON.parse(localStorage.getItem("user"));
-if (!user) window.location.href = "login.html";
-
-const lichHenListEl = document.getElementById("lichHenList");
 const API_BASE = "http://localhost:5221/api";
+const user = JSON.parse(localStorage.getItem("user"));
+
+// ✅ Nếu chưa đăng nhập → redirect
+if (!user) {
+  alert("Vui lòng đăng nhập để tiếp tục.");
+  window.location.href = "../index.html";
+}
+
+// ✅ Giao diện người dùng (avatar + tên)
+document.addEventListener("DOMContentLoaded", () => {
+  const loginLink = document.getElementById("loginLink");
+  const userMenu = document.getElementById("userMenu");
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const avatarImg = document.querySelector(".user-button img");
+
+  if (user && loginLink && userMenu && usernameDisplay) {
+    loginLink.style.display = "none";
+    userMenu.style.display = "inline-block";
+    usernameDisplay.innerText = user.fullName || user.username;
+
+    if (avatarImg) {
+      avatarImg.src = user.avatarUrl
+        ? `http://localhost:5221${user.avatarUrl}`
+        : "../../img/default-avatar.png";
+    }
+  } else {
+    if (userMenu) userMenu.style.display = "none";
+  }
+});
+
+// ✅ Load danh sách lịch hẹn
+const lichHenListEl = document.getElementById("lichHenList");
 
 function mapTrangThai(trangThai) {
   switch (trangThai) {
@@ -27,7 +55,6 @@ function isPast(dateTimeStr) {
 
 async function loadLichHen() {
   try {
-    // ✅ Lấy đúng ID người dùng từ tài khoản
     const profileRes = await fetch(`${API_BASE}/user/profile/${user.taiKhoanId}`);
     const profileData = await profileRes.json();
     const nguoiDungId = profileData.id;
@@ -63,3 +90,23 @@ async function loadLichHen() {
 }
 
 document.addEventListener("DOMContentLoaded", loadLichHen);
+
+// ✅ Toggle dropdown user
+function toggleUserDropdown() {
+  const dropdown = document.getElementById("userDropdown");
+  dropdown.classList.toggle("show");
+}
+
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("userMenu");
+  const dropdown = document.getElementById("userDropdown");
+  if (menu && !menu.contains(e.target)) {
+    dropdown.classList.remove("show");
+  }
+});
+
+function logout() {
+  localStorage.removeItem("user");
+  alert("Đăng xuất thành công!");
+  window.location.href = "../index.html";
+}

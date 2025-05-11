@@ -14,6 +14,4 @@ public partial class PhuongThucChung
     public string? TrangThai { get; set; }
 
     public virtual ICollection<GiaoDich> GiaoDiches { get; set; } = new List<GiaoDich>();
-
-    public virtual ICollection<PhuongThucNguoiDung> PhuongThucNguoiDungs { get; set; } = new List<PhuongThucNguoiDung>();
 }

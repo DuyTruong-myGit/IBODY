@@ -17,15 +17,13 @@ public partial class TaiKhoan
 
     public virtual ICollection<BaoCaoViPham> BaoCaoViPhams { get; set; } = new List<BaoCaoViPham>();
 
-    public virtual ICollection<BinhLuan> BinhLuans { get; set; } = new List<BinhLuan>();
-
     public virtual ICollection<ChuyenGium> ChuyenGia { get; set; } = new List<ChuyenGium>();
+
+    public virtual ICollection<GoiDangKy> GoiDangKies { get; set; } = new List<GoiDangKy>();
 
     public virtual ICollection<HoaDon> HoaDons { get; set; } = new List<HoaDon>();
 
     public virtual ICollection<NguoiDung> NguoiDungs { get; set; } = new List<NguoiDung>();
-
-    public virtual ICollection<PhuongThucNguoiDung> PhuongThucNguoiDungs { get; set; } = new List<PhuongThucNguoiDung>();
 
     public virtual ICollection<ThongBao> ThongBaos { get; set; } = new List<ThongBao>();
 

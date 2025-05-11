@@ -17,6 +17,8 @@ public partial class NguoiDung
 
     public string? MucTieuTamLy { get; set; }
 
+    public string? AvatarUrl { get; set; }
+
     public virtual ICollection<DanhGium> DanhGia { get; set; } = new List<DanhGium>();
 
     public virtual ICollection<LichHen> LichHens { get; set; } = new List<LichHen>();

@@ -1,8 +1,32 @@
-// support-user.js
 const API_BASE_URL = "http://localhost:5221/api";
 const user = JSON.parse(localStorage.getItem("user"));
+    if (!user){
+    alert("Vui lòng đăng nhập để tiếp tục.");
+    return window.location.href = "../index.html";} 
 
-// Lắng nghe sự kiện gửi form
+// ✅ Gộp xử lý hiển thị avatar + tên tài khoản sau khi đăng nhập
+document.addEventListener("DOMContentLoaded", () => {
+  const loginLink = document.getElementById("loginLink");
+  const userMenu = document.getElementById("userMenu");
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const avatarImg = document.querySelector(".user-button img");
+
+  if (user && loginLink && userMenu && usernameDisplay) {
+    loginLink.style.display = "none";
+    userMenu.style.display = "inline-block";
+    usernameDisplay.innerText = user.fullName || user.username;
+
+    if (avatarImg) {
+      avatarImg.src = user.avatarUrl
+        ? `http://localhost:5221${user.avatarUrl}`
+        : "../../img/default-avatar.png"; // fallback ảnh mặc định
+    }
+  } else {
+    if (userMenu) userMenu.style.display = "none";
+  }
+});
+
+// ✅ Gửi yêu cầu hỗ trợ
 const form = document.getElementById("supportForm");
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -15,10 +39,9 @@ form.addEventListener("submit", async function (e) {
     return;
   }
 
-  // Gửi nội dung hỗ trợ về hệ thống (giả định gửi qua API báo cáo như gửi yêu cầu hỗ trợ)
   const payload = {
     nguoiBaoCaoId: user.taiKhoanId,
-    chuyenGiaTaiKhoanId: 0, // ID 0 tượng trưng cho báo cáo hỗ trợ (không phải chuyên gia cụ thể)
+    chuyenGiaTaiKhoanId: 0,
     lyDo: `[HỖ TRỢ] ${topic}: ${content}`
   };
 
@@ -41,3 +64,35 @@ form.addEventListener("submit", async function (e) {
     alert("Đã xảy ra lỗi trong quá trình gửi yêu cầu.");
   }
 });
+
+// ✅ Xử lý dropdown menu người dùng
+function toggleUserDropdown() {
+  const dropdown = document.getElementById("userDropdown");
+  dropdown.classList.toggle("show");
+}
+
+
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("userMenu");
+  const dropdown = document.getElementById("userDropdown");
+  if (!menu.contains(e.target)) {
+    dropdown.classList.remove("show");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("menu-toggle");
+  const nav = document.querySelector(".nav");
+
+  toggleBtn?.addEventListener("click", () => {
+    nav.classList.toggle("open");
+  });
+});
+
+
+
+function logout() {
+  localStorage.removeItem("user");
+  alert("Đăng xuất thành công!");
+  window.location.href = "../index.html";
+}

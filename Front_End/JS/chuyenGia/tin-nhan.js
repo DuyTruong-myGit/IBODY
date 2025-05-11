@@ -50,7 +50,7 @@ async function loadClients() {
       const li = document.createElement("li");
       li.classList.add("chat-item");
       li.innerHTML = `
-        <img src="../images/user.png" alt="user">
+        <img src="${user.avatarUrl ? `http://localhost:5221${user.avatarUrl}` : '../images/user.png'}" alt="user">
         <div>
           <h3>${user.hoTenKhachHang}</h3>
           <p>${user.email}</p>

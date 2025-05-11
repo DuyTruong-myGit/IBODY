@@ -2,7 +2,10 @@ using IBODY_WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IBODY_WebAPI.Helpers;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 namespace IBODY_WebAPI.Controllers
+
 {
     [ApiController]
     [Route("api/user")]
@@ -34,7 +37,8 @@ namespace IBODY_WebAPI.Controllers
                 hoTen = user.HoTen,
                 ngaySinh = user.NgaySinh,
                 gioiTinh = user.GioiTinh,
-                mucTieuTamLy = user.MucTieuTamLy
+                mucTieuTamLy = user.MucTieuTamLy,
+                avatarUrl = user.AvatarUrl
             });
         }
 
@@ -53,6 +57,35 @@ namespace IBODY_WebAPI.Controllers
 
             await _context.SaveChangesAsync();
             return Ok(new { message = "Cập nhật hồ sơ thành công." });
+        }
+
+
+        [HttpPost("upload-avatar/{accountId}")]
+        public async Task<IActionResult> UploadAvatar(int accountId, IFormFile file)
+        {
+            var user = await _context.NguoiDungs.FirstOrDefaultAsync(nd => nd.TaiKhoanId == accountId);
+            if (user == null)
+                return NotFound("Không tìm thấy người dùng.");
+
+            if (file == null || file.Length == 0)
+                return BadRequest("Vui lòng chọn file hợp lệ.");
+
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "img");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var fileName = $"user_{accountId}_{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(folderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            user.AvatarUrl = $"/img/{fileName}";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã cập nhật avatar", avatarUrl = user.AvatarUrl });
         }
 
 
@@ -123,52 +156,6 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { message = "Đã gửi đánh giá!" });
         }
 
-        [HttpPost("thanh-toan-lich-hen")]
-        public async Task<IActionResult> ThanhToanLichHen([FromBody] ThanhToanDto dto)
-        {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var lichHen = await _context.LichHens.FindAsync(dto.LichHenId);
-                if (lichHen == null || lichHen.TrangThai != "cho_thanh_toan")
-                    return BadRequest("Lịch hẹn không hợp lệ hoặc đã thanh toán.");
-                
-                if (lichHen.ThoiGianBatDau < DateTime.Now)
-                    return BadRequest("Lịch hẹn đã diễn ra, không thể thanh toán.");
-
-                var hoaDon = new HoaDon
-                {
-                    TaiKhoanId = dto.TaiKhoanId,
-                    GoiDichVuId = null,
-                    TongTien = dto.SoTien,
-                    ThoiGianTao = DateTime.Now
-                };
-                _context.HoaDons.Add(hoaDon);
-                await _context.SaveChangesAsync();
-
-                var giaoDich = new GiaoDich
-                {
-                    HoaDonId = hoaDon.Id,
-                    PhuongThucId = dto.PhuongThucId,
-                    SoTien = dto.SoTien,
-                    ThoiGian = DateTime.Now
-                };
-                _context.GiaoDiches.Add(giaoDich);
-
-                // Cập nhật trạng thái lịch hẹn
-                lichHen.TrangThai = "da_thanh_toan";
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-                return Ok(new { message = "Thanh toán thành công!" });
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                Console.WriteLine($"❌ Error: {ex.Message}");
-                return StatusCode(500, new { message = "Đã xảy ra lỗi khi thanh toán. Vui lòng thử lại sau." });
-            }
-        }
 
 
         [HttpPost("guiTinNhan")]
@@ -206,44 +193,29 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
-        [HttpGet("lichSuTuVan/{taiKhoanId}")]
-        public async Task<IActionResult> GetLichSuTuVan(int taiKhoanId)
+       [HttpGet("lichSuTuVan/{taiKhoanId}")]
+        public async Task<IActionResult> LichSuTuVan(int taiKhoanId)
         {
-            // Tìm người dùng
-            var nguoiDung = await _context.NguoiDungs
-                .FirstOrDefaultAsync(nd => nd.TaiKhoanId == taiKhoanId);
-
+            var nguoiDung = await _context.NguoiDungs.FirstOrDefaultAsync(x => x.TaiKhoanId == taiKhoanId);
             if (nguoiDung == null)
-                return NotFound(new { message = "Không tìm thấy người dùng." });
+                return NotFound("Không tìm thấy người dùng.");
 
-            var lichSu = await _context.LichHens
-                .Where(lh => lh.NguoiDungId == nguoiDung.Id && lh.TrangThai == "da_thanh_toan")
-                .Include(lh => lh.ChuyenGia)
-                .Include(lh => lh.HinhThuc)
-                .Join(_context.HoaDons,
-                    lh => lh.NguoiDung.TaiKhoanId,
-                    hd => hd.TaiKhoanId,
-                    (lh, hd) => new { LichHen = lh, HoaDon = hd })
-                .Join(_context.GiaoDiches,
-                    combo => combo.HoaDon.Id,
-                    gd => gd.HoaDonId,
-                    (combo, gd) => new
-                    {
-                        combo.LichHen.Id,
-                        ChuyenGia = combo.LichHen.ChuyenGia.HoTen,
-                        combo.LichHen.ThoiGianBatDau,
-                        combo.LichHen.ThoiGianKetThuc,
-                        combo.LichHen.TomTat,
-                        combo.LichHen.HinhThuc.Ten,
-                        HoaDonId = combo.HoaDon.Id,
-                        TongTien = combo.HoaDon.TongTien,
-                        PhuongThucId = gd.PhuongThucId,
-                        ThoiGianThanhToan = gd.ThoiGian
-                    })
-                .OrderByDescending(x => x.ThoiGianThanhToan)
+            var lichHen = await _context.LichHens
+                .Include(l => l.ChuyenGia)
+                .Include(l => l.HinhThuc)
+                .Where(l => l.NguoiDungId == nguoiDung.Id && l.TrangThai == "da_dien_ra")
+                .OrderByDescending(l => l.ThoiGianKetThuc)
+                .Select(l => new {
+                    id = l.Id,
+                    chuyenGia = l.ChuyenGia.HoTen,
+                    thoiGianBatDau = l.ThoiGianBatDau,
+                    thoiGianKetThuc = l.ThoiGianKetThuc,
+                    tomTat = l.TomTat,
+                    ten = l.HinhThuc.Ten
+                })
                 .ToListAsync();
 
-            return Ok(lichSu);
+            return Ok(lichHen);
         }
 
 

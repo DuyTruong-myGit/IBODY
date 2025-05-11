@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using IBODY_WebAPI.Data;
 using IBODY_WebAPI.Helpers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.FileProviders;
 
 
 
@@ -58,6 +59,17 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Vai trò 'quan_tri' đã được thêm thành công.");
     }
 }
+
+app.UseStaticFiles(); // Cho wwwroot
+
+// Thêm cấu hình cho folder 'img'
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "img")),
+    RequestPath = "/img"
+});
+
 
 // ✅ Use middleware
 app.UseCors("AllowAll");

@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IBODY_WebAPI.Models;
 using IBODY_WebAPI.Helpers;
-
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 namespace IBODY_WebAPI.Controllers
 {
     [ApiController]
@@ -37,6 +38,37 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
+        [HttpPost("upload-avatar/{accountId}")]
+        public async Task<IActionResult> UploadAvatar(int accountId, IFormFile file)
+        {
+            var cg = await _context.ChuyenGia.FirstOrDefaultAsync(c => c.TaiKhoanId == accountId);
+            if (cg == null)
+                return NotFound("Không tìm thấy chuyên gia.");
+
+            if (file == null || file.Length == 0)
+                return BadRequest("Vui lòng chọn file hợp lệ.");
+
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "img");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var fileName = $"cg_{accountId}_{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(folderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            cg.AvatarUrl = $"/img/{fileName}";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã cập nhật avatar", avatarUrl = cg.AvatarUrl });
+        }
+
+
+
+
         [HttpPut("doi-mat-khau/{taiKhoanId}")]
         public async Task<IActionResult> DoiMatKhauChuyenGia(int taiKhoanId, [FromBody] DoiMatKhauDto dto)
         {
@@ -64,7 +96,7 @@ namespace IBODY_WebAPI.Controllers
             var coLichHen = await _context.LichHens.AnyAsync(lh =>
                 lh.ChuyenGia.TaiKhoanId == dto.NguoiGuiId &&
                 lh.NguoiDung.TaiKhoanId == dto.NguoiNhanId &&
-                lh.TrangThai == "da_thanh_toan");
+                lh.TrangThai == "da_dien_ra");
 
             if (!coLichHen)
             {
@@ -105,31 +137,6 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
-        [HttpGet("hoaDonCuaChuyenGia")]
-        public async Task<IActionResult> GetHoaDonTuVan(int chuyenGiaTaiKhoanId)
-        {
-            var hoaDons = await _context.LichHens
-                .Include(lh => lh.NguoiDung)
-                .Include(lh => lh.HinhThuc)
-                .Where(lh => lh.ChuyenGia.TaiKhoanId == chuyenGiaTaiKhoanId && lh.TrangThai == "da_thanh_toan")
-                .Join(_context.HoaDons,
-                    lichHen => lichHen.NguoiDung.TaiKhoanId,
-                    hoaDon => hoaDon.TaiKhoanId,
-                    (lichHen, hoaDon) => new
-                    {
-                        HoaDonId = hoaDon.Id,
-                        TaiKhoanNguoiDung = hoaDon.TaiKhoanId,
-                        TenNguoiDung = lichHen.NguoiDung.HoTen,
-                        ThoiGianTao = hoaDon.ThoiGianTao,
-                        TongTien = hoaDon.TongTien,
-                        HinhThuc = lichHen.HinhThuc.Ten,
-                        TuVanThoiGian = lichHen.ThoiGianBatDau
-                    })
-                .OrderByDescending(h => h.ThoiGianTao)
-                .ToListAsync();
-
-            return Ok(hoaDons);
-        }
 
         // API lấy danh sách đánh giá của chuyên gia
         [HttpGet("danhGia/{taiKhoanId}")]
@@ -178,13 +185,15 @@ namespace IBODY_WebAPI.Controllers
                     LichHenId = lh.Id,
                     HoTenKhachHang = lh.NguoiDung.HoTen,
                     Email = lh.NguoiDung.TaiKhoan.Email,
-                    TaiKhoanIdNguoiDung = lh.NguoiDung.TaiKhoan.Id, 
+                    TaiKhoanIdNguoiDung = lh.NguoiDung.TaiKhoan.Id,
+                    AvatarUrl = lh.NguoiDung.AvatarUrl, 
                     Ngay = lh.ThoiGianBatDau.Value.Date,
                     GioBatDau = lh.ThoiGianBatDau,
                     GioKetThuc = lh.ThoiGianKetThuc,
                     TomTat = lh.TomTat,
                     HinhThuc = lh.HinhThuc.Ten,
                     TrangThai = lh.TrangThai
+                    
                 })
                 .OrderByDescending(lh => lh.GioBatDau)
                 .ToListAsync();
@@ -201,7 +210,15 @@ namespace IBODY_WebAPI.Controllers
             if (chuyenGia == null)
                 return NotFound();
 
-            return Ok(chuyenGia);
+            return Ok(new {
+                id = chuyenGia.Id,
+                hoTen = chuyenGia.HoTen,
+                soNamKinhNghiem = chuyenGia.SoNamKinhNghiem,
+                chuyenMon = chuyenGia.ChuyenMon,
+                gioiThieu = chuyenGia.GioiThieu,
+                soChungChi = chuyenGia.SoChungChi,
+                avatarUrl = chuyenGia.AvatarUrl
+            });
         }
 
 

@@ -35,6 +35,7 @@
 
   <div class="tab-content active" id="info">
     <h3>Thông tin chuyên gia</h3>
+    <img id="currentAvatar" src="" alt="avatar" style="max-width: 120px; border-radius: 50%;">
     <p><strong>Họ tên:</strong> <span id="cgFullName"></span></p>
     <p><strong>Email:</strong> <span id="cgEmail"></span></p>
     <p><strong>Chuyên môn:</strong> <span id="cgSpecialty"></span></p>
@@ -46,6 +47,9 @@
   <div class="tab-content" id="edit">
     <h3>Cập nhật thông tin</h3>
     <form id="editForm">
+      <label for="avatarInput">Cập nhật ảnh đại diện:</label>
+      <input type="file" id="avatarInput" accept="image/*">
+      <button type="submit">Lưu thay đổi</button>
       <input type="text" id="editFullName" placeholder="Họ tên" required>
       <input type="text" id="editSpecialty" placeholder="Chuyên môn" required>
       <input type="number" id="editExperience" placeholder="Số năm kinh nghiệm" required>

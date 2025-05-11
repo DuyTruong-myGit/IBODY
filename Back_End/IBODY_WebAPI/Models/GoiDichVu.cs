@@ -17,5 +17,9 @@ public partial class GoiDichVu
 
     public string? DanhCho { get; set; }
 
+    public int SoLuot { get; set; }
+
+    public virtual ICollection<GoiDangKy> GoiDangKies { get; set; } = new List<GoiDangKy>();
+
     public virtual ICollection<HoaDon> HoaDons { get; set; } = new List<HoaDon>();
 }

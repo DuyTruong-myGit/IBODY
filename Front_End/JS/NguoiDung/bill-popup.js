@@ -1,7 +1,9 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  if (!user) return window.location.href = "login.html";
+  if (!user) {
+    alert("Vui lòng đăng nhập để tiếp tục.");
+    return window.location.href = "../index.html";}
 
   // Lấy thông tin hóa đơn gần nhất
   const res = await fetch(`http://localhost:5221/api/user/lichSuTuVan/${user.taiKhoanId}`);

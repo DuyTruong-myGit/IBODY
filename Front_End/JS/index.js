@@ -215,3 +215,15 @@ document.addEventListener("DOMContentLoaded", () => {
     nav.classList.toggle("open");
   });
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const avatarImg = document.querySelector(".user-button img");
+
+  if (user && avatarImg) {
+    avatarImg.src = user.avatarUrl
+      ? `http://localhost:5221${user.avatarUrl}`
+      : "../img/default-avatar.png";
+  }
+});

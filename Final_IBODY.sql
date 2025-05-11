@@ -69,14 +69,7 @@ CREATE TABLE danh_gia (
     nhan_xet NVARCHAR(MAX)
 );
 
-CREATE TABLE binh_luan (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    nguoi_binh_luan_id INT FOREIGN KEY REFERENCES tai_khoan(id),
-    loai_doi_tuong VARCHAR(20) CHECK (loai_doi_tuong IN ('bai_viet', 'chuyen_gia')),
-    doi_tuong_id INT,
-    noi_dung NVARCHAR(MAX),
-    thoi_gian DATETIME
-);
+
 
 CREATE TABLE tin_nhan (
     id INT IDENTITY(1,1) PRIMARY KEY,
@@ -103,6 +96,12 @@ CREATE TABLE goi_dich_vu (
     danh_cho VARCHAR(20) CHECK (danh_cho IN ('nguoi_dung', 'chuyen_gia'))
 );
 
+ALTER TABLE goi_dich_vu
+ADD so_luot INT NOT NULL DEFAULT 1;
+
+UPDATE goi_dich_vu SET so_luot = 4 WHERE ten LIKE '%Cơ bản%';
+UPDATE goi_dich_vu SET so_luot = 8 WHERE ten LIKE '%Nâng cao%';
+
 CREATE TABLE hoa_don (
     id INT IDENTITY(1,1) PRIMARY KEY,
     tai_khoan_id INT FOREIGN KEY REFERENCES tai_khoan(id),
@@ -111,12 +110,6 @@ CREATE TABLE hoa_don (
     thoi_gian_tao DATETIME
 );
 
-CREATE TABLE phuong_thuc_thanh_toan (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    tai_khoan_id INT FOREIGN KEY REFERENCES tai_khoan(id),
-    loai VARCHAR(20) CHECK (loai IN ('the_tin_dung', 'paypal', 'chuyen_khoan')),
-    chi_tiet NVARCHAR(MAX)
-);
 
 CREATE TABLE giao_dich (
     id INT IDENTITY(1,1) PRIMARY KEY,
@@ -144,18 +137,17 @@ CREATE TABLE bao_cao_vi_pham (
     thoi_gian DATETIME
 );
 
-CREATE TABLE the (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    ten NVARCHAR(100)
-);
 
-CREATE TABLE the_chuyen_gia (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    chuyen_gia_id INT FOREIGN KEY REFERENCES chuyen_gia(id),
-    the_id INT FOREIGN KEY REFERENCES the(id)
-);
+SELECT name, definition
+FROM sys.check_constraints
+WHERE parent_object_id = OBJECT_ID('lich_hen');
 
+ALTER TABLE lich_hen DROP CONSTRAINT CK_lich_hen_trang_thai;
+ALTER TABLE lich_hen
+ADD CONSTRAINT CK_lich_hen_trang_thai
+CHECK (trang_thai IN ('cho_duyet', 'da_dien_ra', 'da_thanh_toan', 'da_huy', 'da_hoan_tat'));
 
+SELECT DISTINCT trang_thai FROM lich_hen;
 
 
 
@@ -166,17 +158,31 @@ CREATE TABLE phuong_thuc_chung (
     trang_thai VARCHAR(10) CHECK (trang_thai IN ('hien', 'an')) DEFAULT 'hien'
 );
 
-CREATE TABLE phuong_thuc_nguoi_dung (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    tai_khoan_id INT NOT NULL FOREIGN KEY REFERENCES tai_khoan(id),
-    phuong_thuc_id INT NOT NULL FOREIGN KEY REFERENCES phuong_thuc_chung(id),
-    chi_tiet NVARCHAR(255),
-    da_xac_thuc BIT DEFAULT 0,
-    ngay_tao DATETIME DEFAULT GETDATE(),
-    UNIQUE(tai_khoan_id, phuong_thuc_id)
+
+CREATE TABLE goi_dang_ky (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  tai_khoan_id INT FOREIGN KEY REFERENCES tai_khoan(id),
+  goi_dich_vu_id INT FOREIGN KEY REFERENCES goi_dich_vu(id),
+  ngay_bat_dau DATE NOT NULL,
+  ngay_ket_thuc DATE NOT NULL,
+  so_luot_con_lai INT NOT NULL,
+  trang_thai VARCHAR(20) CHECK (trang_thai IN ('con_hieu_luc', 'het_hieu_luc')) DEFAULT 'con_hieu_luc'
 );
 
-use Final_IBODY
+CREATE TABLE luong_chuyen_gia (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  chuyen_gia_id INT FOREIGN KEY REFERENCES chuyen_gia(id),
+  so_buoi INT,
+  luong_mot_buoi DECIMAL(10,2),
+  tong_luong DECIMAL(10,2),
+  thang INT,
+  nam INT
+);
+
+
+INSERT INTO AspNetRoles (Id, Name, NormalizedName)
+VALUES (NEWID(), 'chuyen_gia', 'CHUYEN_GIA');
+
 
 
 ALTER TABLE lich_hen ADD trang_thai VARCHAR(20) 
@@ -184,20 +190,42 @@ ALTER TABLE lich_hen ADD trang_thai VARCHAR(20)
     DEFAULT 'cho_thanh_toan';
 
 
-	EXEC sp_help 'giao_dich';
+ALTER TABLE lich_hen DROP CONSTRAINT CK__lich_hen__trang_thai;
+ALTER TABLE lich_hen
+ADD CONSTRAINT CK_lich_hen_trang_thai
+CHECK (trang_thai IN ('cho_duyet', 'cho_thanh_toan', 'da_thanh_toan', 'da_huy', 'da_dien_ra'));
+
+
+ALTER TABLE lich_hen DROP CONSTRAINT CK__lich_hen__trang__25518C17;
+
+SELECT name
+FROM sys.check_constraints
+WHERE parent_object_id = OBJECT_ID('lich_hen');
+
+ALTER TABLE lich_hen DROP CONSTRAINT CK_lich_hen_trang_thai;
+
+
+
+ALTER TABLE lich_hen
+ADD CONSTRAINT CK_lich_hen_trang_thai
+CHECK (trang_thai IN ('cho_duyet', 'cho_thanh_toan', 'da_thanh_toan', 'da_huy', 'da_dien_ra'));
+
+
+ALTER TABLE nguoi_dung ADD avatar_url NVARCHAR(255);
+ALTER TABLE chuyen_gia ADD avatar_url NVARCHAR(255);
+
+
+EXEC sp_help 'giao_dich';
 
 
 SELECT *
 FROM lich_hen
 WHERE id = 1;
 
+use Final_IBODY
+
 
 SELECT * FROM tai_khoan WHERE email = 'admin@123.com'
-
-
-
-INSERT INTO AspNetRoles (Id, Name, NormalizedName)
-VALUES (NEWID(), 'chuyen_gia', 'CHUYEN_GIA');
 
 
 

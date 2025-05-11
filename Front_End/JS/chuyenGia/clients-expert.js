@@ -1,6 +1,9 @@
-
-
 window.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user || !user.taiKhoanId || !user.roles.includes("chuyen_gia")) {
+    alert("Bạn không có quyền truy cập trang này.");
+    return (window.location.href = "../index.html");
+  }
   loadClients();
 });
 
@@ -9,13 +12,14 @@ async function loadClients() {
   const taiKhoanId = localUser.taiKhoanId;
 
   try {
-    // Lấy thông tin chuyên gia để ánh xạ từ tài khoản ID
+    // Lấy chuyenGiaId từ taiKhoanId
     const infoRes = await fetch(`http://localhost:5221/api/chuyen-gia/thongTin/${taiKhoanId}`);
     if (!infoRes.ok) throw new Error("Không tìm thấy chuyên gia");
+
     const chuyenGia = await infoRes.json();
     const chuyenGiaId = chuyenGia.id;
 
-    // Gọi API lấy danh sách khách hàng đã tư vấn
+    // Lấy danh sách khách hàng
     const res = await fetch(`http://localhost:5221/api/chuyen-gia/khach-hang-tu-van/${chuyenGiaId}`);
     if (!res.ok) throw new Error("Không thể lấy danh sách khách hàng");
 
@@ -25,7 +29,7 @@ async function loadClients() {
   } catch (err) {
     console.error("loadClients() failed:", err);
     document.getElementById("clientsList").innerHTML = `
-      <tr><td colspan="4">Không thể tải danh sách khách hàng.</td></tr>
+      <tr><td colspan="4" style="color:red;">Lỗi: ${err.message}</td></tr>
     `;
   }
 }
@@ -39,7 +43,6 @@ function renderClients(list) {
     return;
   }
 
-  // Gom nhóm theo email khách hàng
   const clientMap = new Map();
 
   list.forEach(lh => {
@@ -60,7 +63,6 @@ function renderClients(list) {
     }
   });
 
-  // Render ra bảng
   [...clientMap.values()].forEach(client => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -83,7 +85,7 @@ function formatDate(raw) {
   return `${day}/${month}/${year} ${hour}:${minute}`;
 }
 
-// Hàm tìm kiếm khách hàng theo tên
+// Tìm kiếm khách hàng theo tên (có thể mở rộng theo email)
 function searchClients() {
   const keyword = document.getElementById("searchInput").value.toLowerCase();
   const rows = document.querySelectorAll("#clientsList tr");

@@ -79,28 +79,41 @@ namespace IBODY_WebAPI.Controllers
         public async Task<IActionResult> Login(LoginDto dto)
         {
             var tk = await _context.TaiKhoans
-            .FirstOrDefaultAsync(t => t.Email == dto.Email);
+                .FirstOrDefaultAsync(t => t.Email == dto.Email);
 
             if (tk == null)
                 return Forbid("Tài khoản chưa được đăng ký đầy đủ trong hệ thống.");
 
-            // Bước 2: Chặn nếu bị khóa
             if (tk.TrangThai == "khoa")
                 return Forbid("Tài khoản của bạn đã bị khóa.");
 
-            // Bước 3: Tìm user từ Identity
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
                 return Unauthorized(new { message = "Email không tồn tại." });
 
-            // Bước 4: Kiểm tra mật khẩu
             var result = await _signInManager.PasswordSignInAsync(user, dto.Password, true, false);
             if (!result.Succeeded)
                 return Unauthorized(new { message = "Mật khẩu không đúng." });
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            // Bước 5: Trả về thông tin đăng nhập
+            // ✅ Lấy avatarUrl từ bảng tương ứng
+            string? avatarUrl = null;
+
+            if (roles.Contains("nguoi_dung"))
+            {
+                var nguoiDung = await _context.NguoiDungs
+                    .FirstOrDefaultAsync(nd => nd.TaiKhoanId == tk.Id);
+                avatarUrl = nguoiDung?.AvatarUrl;
+            }
+            else if (roles.Contains("chuyen_gia"))
+            {
+                var chuyenGia = await _context.ChuyenGia
+                    .FirstOrDefaultAsync(cg => cg.TaiKhoanId == tk.Id);
+                avatarUrl = chuyenGia?.AvatarUrl;
+            }
+
+            // ✅ Trả kết quả kèm avatar
             return Ok(new
             {
                 message = "Đăng nhập thành công!",
@@ -110,11 +123,12 @@ namespace IBODY_WebAPI.Controllers
                     email = user.Email,
                     fullName = user.FullName,
                     roles = roles,
-                    trangThai = tk.TrangThai
+                    trangThai = tk.TrangThai,
+                    avatarUrl = avatarUrl
                 }
             });
-
         }
+
 
 
 

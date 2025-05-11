@@ -3,7 +3,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const chuyenGiaId = new URLSearchParams(window.location.search).get("chuyenGiaId");
-  if (!user || !chuyenGiaId) return window.location.href = "../login.html";
+  if (!user || !chuyenGiaId){
+    alert("Vui lòng đăng nhập để tiếp tục.");
+    return window.location.href = "../index.html";} 
 
   const userRes = await fetch(`http://localhost:5221/api/user/profile/${user.taiKhoanId}`);
   const userData = await userRes.json();

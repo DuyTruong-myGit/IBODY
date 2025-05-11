@@ -1,87 +1,116 @@
-window.addEventListener("DOMContentLoaded", () => {
-  loadAppointments();
-});
-
-async function loadAppointments() {
+document.addEventListener("DOMContentLoaded", async () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  const chuyenGiaId = user.taiKhoanId;
+  if (!user || !user.taiKhoanId || !user.roles.includes("chuyen_gia")) {
+    alert("Bạn không có quyền truy cập trang này.");
+    return (window.location.href = "../index.html");
+  }
 
-  const listContainer = document.getElementById("appointmentsList");
-  listContainer.innerHTML = "<p>Đang tải lịch hẹn...</p>";
+  const listDangDienRaEl = document.getElementById("lichDangDienRa");
+  const listChoDuyetEl = document.getElementById("lichChoDuyet");
 
   try {
-    const res = await fetch(`http://localhost:5221/api/lich-hen/chuyen-gia/${chuyenGiaId}?taiKhoanId=${chuyenGiaId}`);
-    if (!res.ok) throw new Error("Lỗi API");
+    const profileRes = await fetch(`http://localhost:5221/api/chuyen-gia/thongTin/${user.taiKhoanId}`);
+    if (!profileRes.ok) throw new Error("Không thể lấy thông tin chuyên gia");
 
-    const data = await res.json();
-    listContainer.innerHTML = "";
+    const profileData = await profileRes.json();
+    const chuyenGiaId = profileData.id;
 
-    // Lọc các lịch hẹn có thời gian bắt đầu >= thời điểm hiện tại
+    // 🔵 Lịch đang diễn ra
+    const res1 = await fetch(`http://localhost:5221/api/lich-hen/chuyen-gia/${chuyenGiaId}?taiKhoanId=${user.taiKhoanId}&trangThai=da_dien_ra`);
+    if (!res1.ok) throw new Error("Không thể tải lịch đang diễn ra");
+    const list1 = await res1.json();
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const upcomingAppointments = data.filter(app => {
-      const start = new Date(app.thoiGianBatDau);
-      return start >= today && (app.trangThai === "da_thanh_toan" || app.trangThai === "xac_nhan");
-    });
-
-    if (upcomingAppointments.length === 0) {
-      listContainer.innerHTML = "<p>Không có lịch hẹn sắp tới.</p>";
-      return;
-    }
-    upcomingAppointments.forEach(appointment => {
-      const card = document.createElement("div");
-      card.className = "appointment-card";
-      card.innerHTML = `
-        <div class="appointment-info">
-          <h3>👤 ${appointment.nguoiDatLich.hoTen}</h3>
-          <p>🕒 Thời gian: ${formatDate(appointment.thoiGianBatDau)}</p>
-          <p>💡 Hình thức: ${appointment.hinhThuc}</p>
-          <p>📝 Ghi chú: ${appointment.tomTat || 'Không có'}</p>
+    listDangDienRaEl.innerHTML = list1.length === 0 ? "<p>Không có lịch đang diễn ra.</p>" : list1.map(item => `
+      <div class="lich-item">
+        <h4>Khách hàng: ${item.nguoiDatLich?.hoTen || "Ẩn danh"}</h4>
+        <p><strong>Thời gian:</strong> ${formatDate(item.thoiGianBatDau)} → ${formatTime(item.thoiGianKetThuc)}</p>
+        <p><strong>Hình thức:</strong> ${item.hinhThuc}</p>
+        <p><strong>Tóm tắt:</strong> ${item.tomTat || "Không có"}</p>
+        <div class="btn-group">
+          <button onclick="hoanTat(${item.id})">✅ Hoàn tất</button>
+          <button onclick="huyLich(${item.id})">❌ Hủy</button>
         </div>
-        <div class="appointment-actions">
-          <button class="btn-confirm" onclick="confirmAppointment(${appointment.id})">Đã xác nhận</button>
-          <button class="btn-reject" onclick="rejectAppointment(${appointment.id})">Từ chối</button>
+      </div>
+    `).join("");
+
+    // 🟡 Lịch chờ duyệt
+    const res2 = await fetch(`http://localhost:5221/api/lich-hen/chuyen-gia/${chuyenGiaId}?taiKhoanId=${user.taiKhoanId}&trangThai=cho_duyet`);
+    if (!res2.ok) throw new Error("Không thể tải lịch chờ duyệt");
+    const list2 = await res2.json();
+
+    listChoDuyetEl.innerHTML = list2.length === 0 ? "<p>Không có lịch chờ duyệt.</p>" : list2.map(item => `
+      <div class="lich-item">
+        <h4>Khách hàng: ${item.nguoiDatLich?.hoTen || "Ẩn danh"}</h4>
+        <p><strong>Thời gian:</strong> ${formatDate(item.thoiGianBatDau)} → ${formatTime(item.thoiGianKetThuc)}</p>
+        <p><strong>Hình thức:</strong> ${item.hinhThuc}</p>
+        <p><strong>Tóm tắt:</strong> ${item.tomTat || "Không có"}</p>
+        <div class="btn-group">
+          <button onclick="duyetLich(${item.id})">✅ Duyệt</button>
+          <button onclick="tuChoi(${item.id})">❌ Từ chối</button>
         </div>
-      `;
-      listContainer.appendChild(card);
-    });
+      </div>
+    `).join("");
 
   } catch (err) {
-    console.error("loadAppointments() failed:", err);
-    listContainer.innerHTML = "<p>Không thể tải lịch hẹn.</p>";
+    listDangDienRaEl.innerHTML = listChoDuyetEl.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+  }
+});
+
+function formatDate(dateStr) {
+  return new Date(dateStr).toLocaleString("vi-VN");
+}
+
+function formatTime(dateStr) {
+  return new Date(dateStr).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+}
+
+async function duyetLich(id) {
+  if (!confirm("Xác nhận duyệt lịch này?")) return;
+  try {
+    const res = await fetch(`http://localhost:5221/api/lich-hen/duyet-lich/${id}`, { method: "POST" });
+    const data = await res.json();
+    alert(data.message || "Đã duyệt lịch.");
+    location.reload();
+  } catch (err) {
+    alert("Lỗi khi duyệt lịch.");
   }
 }
 
-function confirmAppointment(id) {
-  alert("✅ Bạn đã xác nhận lịch hẹn #" + id);
+async function tuChoi(id) {
+  if (!confirm("Bạn có chắc muốn từ chối lịch này?")) return;
+  try {
+    const res = await fetch(`http://localhost:5221/api/lich-hen/tu-choi-lich/${id}`, { method: "POST" });
+    const data = await res.json();
+    alert(data.message || "Đã từ chối lịch.");
+    location.reload();
+  } catch (err) {
+    alert("Lỗi khi từ chối lịch.");
+  }
 }
 
-function rejectAppointment(id) {
-  alert("⚠️ Bạn đã từ chối lịch hẹn #" + id);
+async function hoanTat(id) {
+  if (!confirm("Xác nhận hoàn tất buổi tư vấn?")) return;
+  try {
+    const res = await fetch(`http://localhost:5221/api/lich-hen/hoan-tat/${id}`, { method: "POST" });
+    const data = await res.json();
+    alert(data.message || "Đã hoàn tất buổi tư vấn.");
+    location.reload();
+  } catch (err) {
+    alert("Lỗi khi hoàn tất lịch.");
+  }
 }
 
-function formatDate(raw) {
-  const date = new Date(raw);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  const hour = date.getHours().toString().padStart(2, '0');
-  const minute = date.getMinutes().toString().padStart(2, '0');
-  return `${day}/${month}/${year} ${hour}:${minute}`;
-}
-
-function logout() {
-  localStorage.removeItem("user");
-  alert("Đăng xuất thành công!"); 
-  window.location.href = "../index.html";
-}
-
-
-
-function logout() {
-  localStorage.removeItem("user");
-  alert("Đăng xuất thành công!"); 
-  window.location.href = "../index.html";
+async function huyLich(id) {
+  if (!confirm("Bạn chắc chắn muốn hủy lịch này?")) return;
+  const user = JSON.parse(localStorage.getItem("user"));
+  try {
+    const res = await fetch(`http://localhost:5221/api/lich-hen/huy-lich-chuyen-gia/${id}?taiKhoanId=${user.taiKhoanId}`, {
+      method: "DELETE"
+    });
+    const data = await res.json();
+    alert(data.message || "Đã hủy lịch.");
+    location.reload();
+  } catch (err) {
+    alert("Lỗi khi hủy lịch.");
+  }
 }

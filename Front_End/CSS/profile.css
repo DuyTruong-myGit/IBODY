@@ -1,46 +1,50 @@
-.profile-container {
-  display: flex;
-  gap: 30px;
-  max-width: 1100px;
-  margin: 40px auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  padding: 30px;
+
+/* Body chung */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f2f4f7;
+  margin: 0;
+  padding: 0;
 }
 
+/* Container hồ sơ */
+.profile-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Nút chuyển tab */
 .tab-buttons {
-  flex-shrink: 0;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 200px;
+  justify-content: space-around;
+  margin-bottom: 2rem;
 }
 
 .tab-btn {
-  padding: 12px 20px;
+  padding: 0.75rem 1.5rem;
+  background-color: #e0e0e0;
   border: none;
-  background: #f1f1f1;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  border-left: 4px solid transparent;
-  font-size: 16px;
-  text-align: left;
-  border-radius: 4px;
-  transition: all 0.3s;
+  transition: background-color 0.3s ease;
 }
 
 .tab-btn:hover {
-  background: #e2e2e2;
+  background-color: #d0d0d0;
 }
 
 .tab-btn.active {
-  background: #007bff;
+  background-color: #007BFF;
   color: white;
-  border-left: 4px solid #0056b3;
 }
 
+/* Nội dung tab */
 .tab-content {
-  flex-grow: 1;
   display: block;
 }
 
@@ -48,72 +52,95 @@
   display: none;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+/* Hiển thị thông tin người dùng */
+.current-info-box {
+  text-align: left;
+  line-height: 1.8;
+  font-size: 16px;
 }
 
-form label {
-  display: flex;
-  flex-direction: column;
-  font-weight: 500;
-  color: #333;
+/* Avatar hiển thị */
+#currentAvatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  margin-bottom: 1rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-form input,
-form select,
-form textarea {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+/* Form upload avatar */
+#avatarUploadForm {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f1f1f1;
+  border-left: 4px solid #007BFF;
+  border-radius: 8px;
 }
 
-form button {
-  padding: 10px 15px;
-  background-color: #007bff;
+#avatarUploadForm label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+#avatarUploadForm input[type="file"] {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+#avatarUploadForm button {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  background-color: #007BFF;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
+}
+
+#avatarUploadForm button:hover {
+  background-color: #0056b3;
+}
+
+/* Form chỉnh sửa */
+form label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+form input[type="text"],
+form input[type="date"],
+form select,
+form textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+form textarea {
+  resize: vertical;
+}
+
+form button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #007BFF;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 form button:hover {
   background-color: #0056b3;
-}
-
-.lich-tu-van-item {
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 6px;
-  background-color: #fdfdfd;
-  margin-bottom: 1rem;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
-}
-
-.lich-tu-van-item h4 {
-  margin: 0 0 5px;
-  color: #007bff;
-}
-
-
-.current-info-box {
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  line-height: 1.6;
-}
-
-.current-info-box p {
-  margin: 10px 0;
-  font-size: 16px;
-}
-
-.current-info-box strong {
-  color: #333;
-  width: 140px;
-  display: inline-block;
 }

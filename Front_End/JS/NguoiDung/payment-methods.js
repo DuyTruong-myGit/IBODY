@@ -1,62 +1,52 @@
-// thanh-toan.js
-
 document.addEventListener("DOMContentLoaded", async () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  const lichHenId = new URLSearchParams(window.location.search).get("lichHenId");
-  if (!user || !lichHenId) return window.location.href = "login.html";
+    if (!user){
+    alert("Vui lòng đăng nhập để tiếp tục.");
+    return window.location.href = "../index.html";} 
 
-  const resLich = await fetch(`http://localhost:5221/api/dat-lich/chi-tiet/${lichHenId}`);
-  const lich = await resLich.json();
+  const goiId = new URLSearchParams(window.location.search).get("goiId");
+  if (!goiId) return alert("Không xác định được gói dịch vụ.");
 
-  if (!resLich.ok || lich.trangThai !== "cho_thanh_toan") {
-    alert("❌ Lịch hẹn không hợp lệ hoặc chưa được duyệt.");
-    return window.location.href = "lich-hen-user.html";
-  }
+  // Hiển thị thông tin người dùng
+  document.getElementById("userFullName").textContent = user.fullName || "Không rõ";
+  document.getElementById("userEmail").textContent = user.email;
 
-  const infoBox = document.getElementById("lichHenInfo");
-  infoBox.innerHTML = `
-    <p><strong>Chuyên gia:</strong> ${lich.chuyenGia?.hoTen}</p>
-    <p><strong>Thời gian:</strong> ${new Date(lich.thoiGianBatDau).toLocaleString()} → ${new Date(lich.thoiGianKetThuc).toLocaleTimeString()}</p>
-    <p><strong>Hình thức:</strong> ${lich.hinhThuc?.ten}</p>
-    <p><strong>Giá:</strong> ${Number(lich.hinhThuc?.giaCoBan).toLocaleString()} VNĐ</p>
-    <p><strong>Tóm tắt:</strong> ${lich.tomTat || "(không có)"}</p>
-  `;
+  try {
+    // ✅ Gọi API lấy chi tiết gói
+    const res = await fetch(`http://localhost:5221/api/goi-dich-vu/chi-tiet/${goiId}`);
+    const goi = await res.json();
 
-  const ptRes = await fetch("http://localhost:5221/api/user/phuong-thuc-thanh-toan");
-  const ptList = await ptRes.json();
-  const ptSelect = document.getElementById("paymentMethod");
-  ptList.forEach(pt => {
-    const opt = document.createElement("option");
-    opt.value = pt.id;
-    opt.textContent = pt.ten;
-    ptSelect.appendChild(opt);
-  });
+    // ✅ Hiển thị gói
+    document.getElementById("goiTen").textContent = goi.ten;
+    document.getElementById("goiMoTa").textContent = goi.moTa;
+    document.getElementById("goiGia").textContent = Number(goi.gia).toLocaleString() + "₫";
+    document.getElementById("goiThoiHan").textContent = `${goi.thoiHanNgay} ngày`;
 
-  document.getElementById("paymentForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    // ✅ Khi bấm xác nhận thanh toán
+    document.getElementById("paymentForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        const res2 = await fetch("http://localhost:5221/api/goi-dich-vu/dang-ky", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            taiKhoanId: user.taiKhoanId,
+            goiDichVuId: goi.id
+          })
+        });
 
-    const phuongThucId = document.getElementById("paymentMethod").value;
-    if (!phuongThucId) return alert("Vui lòng chọn phương thức thanh toán.");
+        const text = await res2.text();
+        const data = JSON.parse(text);
+        if (!res2.ok) return alert("❌ Lỗi đăng ký gói: " + (data.message || "Lỗi không xác định"));
 
-    const resPay = await fetch("http://localhost:5221/api/user/thanh-toan-lich-hen", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        lichHenId: lichHenId,
-        taiKhoanId: user.taiKhoanId,
-        phuongThucId: Number(phuongThucId),
-        soTien: lich.hinhThuc.giaCoBan
-      })
+        alert("✅ Thanh toán & đăng ký gói thành công!");
+        window.location.href = "dang-ky-goi.html";
+      } catch (err) {
+        alert("❌ Lỗi khi thanh toán: " + err.message);
+      }
     });
 
-    const payText = await resPay.text();
-    try {
-      const data = JSON.parse(payText);
-      if (!resPay.ok) return alert("❌ Thanh toán thất bại: " + (data.message || "Lỗi không xác định"));
-      alert("✅ Thanh toán thành công!");
-      window.location.href = "bill-popup.html";
-    } catch {
-      alert("❌ Lỗi phản hồi: " + payText);
-    }
-  });
+  } catch (err) {
+    alert("❌ Không thể tải thông tin gói: " + err.message);
+  }
 });

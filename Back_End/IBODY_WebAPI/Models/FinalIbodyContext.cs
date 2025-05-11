@@ -29,13 +29,13 @@ public partial class FinalIbodyContext : DbContext
 
     public virtual DbSet<BaoCaoViPham> BaoCaoViPhams { get; set; }
 
-    public virtual DbSet<BinhLuan> BinhLuans { get; set; }
-
     public virtual DbSet<ChuyenGium> ChuyenGia { get; set; }
 
     public virtual DbSet<DanhGium> DanhGia { get; set; }
 
     public virtual DbSet<GiaoDich> GiaoDiches { get; set; }
+
+    public virtual DbSet<GoiDangKy> GoiDangKies { get; set; }
 
     public virtual DbSet<GoiDichVu> GoiDichVus { get; set; }
 
@@ -47,11 +47,11 @@ public partial class FinalIbodyContext : DbContext
 
     public virtual DbSet<LichHen> LichHens { get; set; }
 
+    public virtual DbSet<LuongChuyenGium> LuongChuyenGia { get; set; }
+
     public virtual DbSet<NguoiDung> NguoiDungs { get; set; }
 
     public virtual DbSet<PhuongThucChung> PhuongThucChungs { get; set; }
-
-    public virtual DbSet<PhuongThucNguoiDung> PhuongThucNguoiDungs { get; set; }
 
     public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
 
@@ -156,29 +156,6 @@ public partial class FinalIbodyContext : DbContext
                 .HasConstraintName("FK__bao_cao_v__nguoi__71D1E811");
         });
 
-        modelBuilder.Entity<BinhLuan>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__binh_lua__3213E83FA003E0D3");
-
-            entity.ToTable("binh_luan");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.DoiTuongId).HasColumnName("doi_tuong_id");
-            entity.Property(e => e.LoaiDoiTuong)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasColumnName("loai_doi_tuong");
-            entity.Property(e => e.NguoiBinhLuanId).HasColumnName("nguoi_binh_luan_id");
-            entity.Property(e => e.NoiDung).HasColumnName("noi_dung");
-            entity.Property(e => e.ThoiGian)
-                .HasColumnType("datetime")
-                .HasColumnName("thoi_gian");
-
-            entity.HasOne(d => d.NguoiBinhLuan).WithMany(p => p.BinhLuans)
-                .HasForeignKey(d => d.NguoiBinhLuanId)
-                .HasConstraintName("FK__binh_luan__nguoi__5812160E");
-        });
-
         modelBuilder.Entity<ChuyenGium>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__chuyen_g__3213E83F0A038242");
@@ -186,6 +163,9 @@ public partial class FinalIbodyContext : DbContext
             entity.ToTable("chuyen_gia");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AvatarUrl)
+                .HasMaxLength(255)
+                .HasColumnName("avatar_url");
             entity.Property(e => e.ChuyenMon).HasColumnName("chuyen_mon");
             entity.Property(e => e.GioiThieu).HasColumnName("gioi_thieu");
             entity.Property(e => e.HoTen)
@@ -257,6 +237,33 @@ public partial class FinalIbodyContext : DbContext
                 .HasConstraintName("FK_giao_dich_phuong_thuc_chung");
         });
 
+        modelBuilder.Entity<GoiDangKy>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__goi_dang__3213E83F3C82B39B");
+
+            entity.ToTable("goi_dang_ky");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.GoiDichVuId).HasColumnName("goi_dich_vu_id");
+            entity.Property(e => e.NgayBatDau).HasColumnName("ngay_bat_dau");
+            entity.Property(e => e.NgayKetThuc).HasColumnName("ngay_ket_thuc");
+            entity.Property(e => e.SoLuotConLai).HasColumnName("so_luot_con_lai");
+            entity.Property(e => e.TaiKhoanId).HasColumnName("tai_khoan_id");
+            entity.Property(e => e.TrangThai)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValue("con_hieu_luc")
+                .HasColumnName("trang_thai");
+
+            entity.HasOne(d => d.GoiDichVu).WithMany(p => p.GoiDangKies)
+                .HasForeignKey(d => d.GoiDichVuId)
+                .HasConstraintName("FK__goi_dang___goi_d__3F115E1A");
+
+            entity.HasOne(d => d.TaiKhoan).WithMany(p => p.GoiDangKies)
+                .HasForeignKey(d => d.TaiKhoanId)
+                .HasConstraintName("FK__goi_dang___tai_k__3E1D39E1");
+        });
+
         modelBuilder.Entity<GoiDichVu>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__goi_dich__3213E83F745514DC");
@@ -272,6 +279,9 @@ public partial class FinalIbodyContext : DbContext
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("gia");
             entity.Property(e => e.MoTa).HasColumnName("mo_ta");
+            entity.Property(e => e.SoLuot)
+                .HasDefaultValue(1)
+                .HasColumnName("so_luot");
             entity.Property(e => e.Ten)
                 .HasMaxLength(255)
                 .HasColumnName("ten");
@@ -380,6 +390,29 @@ public partial class FinalIbodyContext : DbContext
                 .HasConstraintName("FK__lich_hen__nguoi___4D94879B");
         });
 
+        modelBuilder.Entity<LuongChuyenGium>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__luong_ch__3213E83FB155FD5E");
+
+            entity.ToTable("luong_chuyen_gia");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ChuyenGiaId).HasColumnName("chuyen_gia_id");
+            entity.Property(e => e.LuongMotBuoi)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("luong_mot_buoi");
+            entity.Property(e => e.Nam).HasColumnName("nam");
+            entity.Property(e => e.SoBuoi).HasColumnName("so_buoi");
+            entity.Property(e => e.Thang).HasColumnName("thang");
+            entity.Property(e => e.TongLuong)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("tong_luong");
+
+            entity.HasOne(d => d.ChuyenGia).WithMany(p => p.LuongChuyenGia)
+                .HasForeignKey(d => d.ChuyenGiaId)
+                .HasConstraintName("FK__luong_chu__chuye__43D61337");
+        });
+
         modelBuilder.Entity<NguoiDung>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__nguoi_du__3213E83F383FAAE5");
@@ -387,6 +420,9 @@ public partial class FinalIbodyContext : DbContext
             entity.ToTable("nguoi_dung");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AvatarUrl)
+                .HasMaxLength(255)
+                .HasColumnName("avatar_url");
             entity.Property(e => e.GioiTinh)
                 .HasMaxLength(10)
                 .IsUnicode(false)
@@ -421,39 +457,6 @@ public partial class FinalIbodyContext : DbContext
                 .IsUnicode(false)
                 .HasDefaultValue("hien")
                 .HasColumnName("trang_thai");
-        });
-
-        modelBuilder.Entity<PhuongThucNguoiDung>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__phuong_t__3213E83FD1E8162F");
-
-            entity.ToTable("phuong_thuc_nguoi_dung");
-
-            entity.HasIndex(e => new { e.TaiKhoanId, e.PhuongThucId }, "UQ__phuong_t__FFAAD5A0994770B4").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ChiTiet)
-                .HasMaxLength(255)
-                .HasColumnName("chi_tiet");
-            entity.Property(e => e.DaXacThuc)
-                .HasDefaultValue(false)
-                .HasColumnName("da_xac_thuc");
-            entity.Property(e => e.NgayTao)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("ngay_tao");
-            entity.Property(e => e.PhuongThucId).HasColumnName("phuong_thuc_id");
-            entity.Property(e => e.TaiKhoanId).HasColumnName("tai_khoan_id");
-
-            entity.HasOne(d => d.PhuongThuc).WithMany(p => p.PhuongThucNguoiDungs)
-                .HasForeignKey(d => d.PhuongThucId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__phuong_th__phuon__17036CC0");
-
-            entity.HasOne(d => d.TaiKhoan).WithMany(p => p.PhuongThucNguoiDungs)
-                .HasForeignKey(d => d.TaiKhoanId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__phuong_th__tai_k__160F4887");
         });
 
         modelBuilder.Entity<TaiKhoan>(entity =>
