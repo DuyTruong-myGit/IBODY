@@ -89,35 +89,6 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
-        [HttpPut("change-password/{accountId}")]
-        public async Task<IActionResult> ChangePassword(int accountId, [FromBody] ChangePasswordDto dto)
-        {
-            try
-            {
-                var account = await _context.TaiKhoans.FindAsync(accountId);
-                if (account == null)
-                    return NotFound(new { message = "Không tìm thấy tài khoản." });
-
-                if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, account.MatKhau))
-                    return BadRequest(new { message = "Mật khẩu hiện tại không đúng." });
-                    Console.WriteLine("Stored hash: " + account.MatKhau);
-
-
-                account.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-                await _context.SaveChangesAsync();
-
-                return Ok(new { message = "Đổi mật khẩu thành công." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    message = "Đã xảy ra lỗi trong quá trình đổi mật khẩu.",
-                    error = ex.Message
-                });
-            }
-        }
-
 
         
             //Đánh giá chuyên gia chỉ sau khi kết thúc lịch hẹn
@@ -260,6 +231,30 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
+        [HttpPost("yeu-cau-chuyen-khoan")]
+        public async Task<IActionResult> TaoYeuCauThanhToan([FromBody] YeuCauXacNhanDto dto)
+        {
+            var existed = await _context.YeuCauXacNhanGoiDichVus
+                .AnyAsync(x => x.TaiKhoanId == dto.TaiKhoanId && x.TrangThai == "cho_duyet");
+
+            if (existed)
+                return BadRequest(new { message = "Bạn đã có yêu cầu đang chờ xác nhận." });
+
+            var yeuCau = new YeuCauXacNhanGoiDichVu
+            {
+                TaiKhoanId = dto.TaiKhoanId,
+                GoiDichVuId = dto.GoiDichVuId,
+                NoiDungChuyenKhoan = $"user_{dto.TaiKhoanId}_goi_{dto.GoiDichVuId}",
+                TrangThai = "cho_duyet"
+            };
+
+            _context.YeuCauXacNhanGoiDichVus.Add(yeuCau);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã gửi yêu cầu xác nhận chuyển khoản." });
+        }
+
+
+
     }
 
 
@@ -302,6 +297,22 @@ namespace IBODY_WebAPI.Controllers
     public int NguoiNhanId { get; set; }
     public string NoiDung { get; set; } = null!;
 }
+public class YeuCauXacNhanDto
+{
+    public int TaiKhoanId { get; set; }
+    public int GoiDichVuId { get; set; }
+}
+
+public class YeuCauXacNhanGoiDichVu
+{
+    public int Id { get; set; }
+    public int TaiKhoanId { get; set; }
+    public int GoiDichVuId { get; set; }
+    public string NoiDungChuyenKhoan { get; set; } = null!;
+    public string TrangThai { get; set; } = "cho_duyet";
+    public DateTime NgayTao { get; set; } = DateTime.Now;
+}
+
 
 }
 

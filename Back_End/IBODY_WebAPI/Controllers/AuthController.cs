@@ -13,16 +13,20 @@ namespace IBODY_WebAPI.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IEmailService _emailService;
+
 
         public AuthController(UserManager<ApplicationUser> userManager,
                               SignInManager<ApplicationUser> signInManager,
                               RoleManager<IdentityRole> roleManager,
-                              FinalIbodyContext context)
+                              FinalIbodyContext context,
+                              IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _context = context;
+            _emailService = emailService;
         }
 
         // //✅ Đăng ký
@@ -186,8 +190,80 @@ namespace IBODY_WebAPI.Controllers
 
             return Ok(new { message = $"Đăng ký thành công với vai trò {dto.VaiTro}" });
         }
+
     
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest model)
+        {
+            var user = await _context.TaiKhoans.FirstOrDefaultAsync(x => x.Email == model.Email);
+            if (user == null)
+                return NotFound("Email không tồn tại.");
+
+            // Tạo token và lưu DB
+            var token = Guid.NewGuid().ToString();
+            user.ResetToken = token;
+            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
+            await _context.SaveChangesAsync();
+
+            // Soạn nội dung email chỉ chứa token (không chứa link)
+            string emailContent = $@"
+                <h3>Khôi phục mật khẩu</h3>
+                <p>Mã xác nhận của bạn là:</p>
+                <h2>{token}</h2>
+                <p>Sao chép mã này và dán vào trang khôi phục mật khẩu để tiếp tục.</p>";
+
+            await _emailService.SendEmailAsync(user.Email, "Mã xác nhận khôi phục mật khẩu", emailContent);
+
+            return Ok("Mã xác nhận đã được gửi đến email của bạn.");
+        }
+
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest model)
+        {
+            var taiKhoan = await _context.TaiKhoans.FirstOrDefaultAsync(x =>
+                x.ResetToken == model.Token && x.ResetTokenExpiry > DateTime.UtcNow);
+
+            if (taiKhoan == null)
+                return BadRequest("Token không hợp lệ hoặc đã hết hạn.");
+
+            // ✅ Tìm user bên Identity
+            var user = await _userManager.FindByEmailAsync(taiKhoan.Email);
+            if (user == null)
+                return BadRequest("Không tìm thấy người dùng trong Identity.");
+
+            // ✅ Reset mật khẩu Identity
+            var removePassword = await _userManager.RemovePasswordAsync(user);
+            var addPassword = await _userManager.AddPasswordAsync(user, model.NewPassword);
+
+            if (!addPassword.Succeeded)
+                return BadRequest("Không thể cập nhật mật khẩu.");
+
+            // ✅ Đồng bộ mật khẩu bảng riêng nếu bạn vẫn cần dùng
+            taiKhoan.MatKhau = "hashed_by_identity";
+            taiKhoan.ResetToken = null;
+            taiKhoan.ResetTokenExpiry = null;
+            await _context.SaveChangesAsync();
+
+            return Ok("Mật khẩu đã được thay đổi thành công.");
+        }
+
+
+
+
     }
+    public class ForgotPasswordRequest
+{
+    public string Email { get; set; }
+}
+public class ResetPasswordRequest
+{
+    public string Token { get; set; }
+    public string NewPassword { get; set; }
+}
+
+
+
     // public class RegisterDto
     // {
     //     public string Email { get; set; } = null!;

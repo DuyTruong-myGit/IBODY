@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using IBODY_WebAPI.Controllers;
 
 namespace IBODY_WebAPI.Models;
 
@@ -14,7 +15,7 @@ public partial class FinalIbodyContext : DbContext
         : base(options)
     {
     }
-
+    
     public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
 
     public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
@@ -47,8 +48,6 @@ public partial class FinalIbodyContext : DbContext
 
     public virtual DbSet<LichHen> LichHens { get; set; }
 
-    public virtual DbSet<LuongChuyenGium> LuongChuyenGia { get; set; }
-
     public virtual DbSet<NguoiDung> NguoiDungs { get; set; }
 
     public virtual DbSet<PhuongThucChung> PhuongThucChungs { get; set; }
@@ -60,6 +59,9 @@ public partial class FinalIbodyContext : DbContext
     public virtual DbSet<ThongBao> ThongBaos { get; set; }
 
     public virtual DbSet<TinNhan> TinNhans { get; set; }
+
+    public virtual DbSet<YeuCauNhanLuong> YeuCauNhanLuongs { get; set; }
+    public DbSet<YeuCauXacNhanGoiDichVu> YeuCauXacNhanGoiDichVus { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -175,7 +177,13 @@ public partial class FinalIbodyContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("so_chung_chi");
             entity.Property(e => e.SoNamKinhNghiem).HasColumnName("so_nam_kinh_nghiem");
+            entity.Property(e => e.SoTaiKhoan)
+                .HasMaxLength(50)
+                .HasColumnName("so_tai_khoan");
             entity.Property(e => e.TaiKhoanId).HasColumnName("tai_khoan_id");
+            entity.Property(e => e.TenNganHang)
+                .HasMaxLength(255)
+                .HasColumnName("ten_ngan_hang");
             entity.Property(e => e.TrangThai)
                 .HasMaxLength(20)
                 .IsUnicode(false)
@@ -390,29 +398,6 @@ public partial class FinalIbodyContext : DbContext
                 .HasConstraintName("FK__lich_hen__nguoi___4D94879B");
         });
 
-        modelBuilder.Entity<LuongChuyenGium>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__luong_ch__3213E83FB155FD5E");
-
-            entity.ToTable("luong_chuyen_gia");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ChuyenGiaId).HasColumnName("chuyen_gia_id");
-            entity.Property(e => e.LuongMotBuoi)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("luong_mot_buoi");
-            entity.Property(e => e.Nam).HasColumnName("nam");
-            entity.Property(e => e.SoBuoi).HasColumnName("so_buoi");
-            entity.Property(e => e.Thang).HasColumnName("thang");
-            entity.Property(e => e.TongLuong)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("tong_luong");
-
-            entity.HasOne(d => d.ChuyenGia).WithMany(p => p.LuongChuyenGia)
-                .HasForeignKey(d => d.ChuyenGiaId)
-                .HasConstraintName("FK__luong_chu__chuye__43D61337");
-        });
-
         modelBuilder.Entity<NguoiDung>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__nguoi_du__3213E83F383FAAE5");
@@ -476,6 +461,12 @@ public partial class FinalIbodyContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("mat_khau");
+            entity.Property(e => e.ResetToken)
+                .HasMaxLength(255)
+                .HasColumnName("reset_token");
+            entity.Property(e => e.ResetTokenExpiry)
+                .HasColumnType("datetime")
+                .HasColumnName("reset_token_expiry");
             entity.Property(e => e.TrangThai)
                 .HasMaxLength(20)
                 .IsUnicode(false)
@@ -546,6 +537,26 @@ public partial class FinalIbodyContext : DbContext
             entity.HasOne(d => d.NguoiNhan).WithMany(p => p.TinNhanNguoiNhans)
                 .HasForeignKey(d => d.NguoiNhanId)
                 .HasConstraintName("FK__tin_nhan__nguoi___5CD6CB2B");
+        });
+
+        modelBuilder.Entity<YeuCauNhanLuong>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__YeuCauNh__3214EC0718CF2FC3");
+
+            entity.ToTable("YeuCauNhanLuong");
+
+            entity.Property(e => e.NgayTao)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.SoTien).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.TrangThai)
+                .HasMaxLength(20)
+                .HasDefaultValue("dang_cho");
+
+            entity.HasOne(d => d.ChuyenGia).WithMany(p => p.YeuCauNhanLuongs)
+                .HasForeignKey(d => d.ChuyenGiaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__YeuCauNha__Chuye__4B7734FF");
         });
 
         OnModelCreatingPartial(modelBuilder);

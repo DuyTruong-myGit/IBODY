@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("goiMoTa").textContent = goi.moTa;
     document.getElementById("goiGia").textContent = Number(goi.gia).toLocaleString() + "₫";
     document.getElementById("goiThoiHan").textContent = `${goi.thoiHanNgay} ngày`;
+    document.getElementById("chuyenKhoanGhiChu").textContent =`user_${user.taiKhoanId}_goi_${goi.id}`;
+
 
     // ✅ Khi bấm xác nhận thanh toán
     document.getElementById("paymentForm").addEventListener("submit", async (e) => {

@@ -23,15 +23,19 @@ public partial class ChuyenGium
 
     public string? AvatarUrl { get; set; }
 
+    public string? SoTaiKhoan { get; set; }
+
+    public string? TenNganHang { get; set; }
+
     public virtual ICollection<DanhGium> DanhGia { get; set; } = new List<DanhGium>();
 
     public virtual ICollection<HocVanChuyenGium> HocVanChuyenGia { get; set; } = new List<HocVanChuyenGium>();
 
     public virtual ICollection<LichHen> LichHens { get; set; } = new List<LichHen>();
 
-    public virtual ICollection<LuongChuyenGium> LuongChuyenGia { get; set; } = new List<LuongChuyenGium>();
-
     public virtual TaiKhoan? TaiKhoan { get; set; }
 
     public virtual ICollection<ThoiGianRanhChuyenGium> ThoiGianRanhChuyenGia { get; set; } = new List<ThoiGianRanhChuyenGium>();
+
+    public virtual ICollection<YeuCauNhanLuong> YeuCauNhanLuongs { get; set; } = new List<YeuCauNhanLuong>();
 }

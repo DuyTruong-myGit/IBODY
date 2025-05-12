@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Yêu cầu nhận lương</title>
+  <link rel="stylesheet" href="../../CSS/chuyenGia/yeuCauLuong.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Trang yêu cầu nhận lương</h2>
+
+    <div class="expert-info">
+      <p><strong>Họ tên:</strong> <span id="expertName"></span></p>
+      <p><strong>Email:</strong> <span id="expertEmail"></span></p>
+      <p><strong>Số tài khoản:</strong> <span id="bankAccount"></span></p>
+      <p><strong>Ngân hàng:</strong> <span id="bankName"></span></p>
+    </div>
+
+    <div class="salary-summary">
+      <p><strong>Tổng số ca có thể nhận:</strong> <span id="totalCa">0</span></p>
+      <p><strong>Tiền mỗi ca:</strong> <span id="donGia">0</span> VNĐ</p>
+      <p><strong>Tổng tiền:</strong> <span id="tongTien">0</span> VNĐ</p>
+      <button id="guiYeuCauBtn">Gửi yêu cầu nhận lương</button>
+    </div>
+
+    <h3>Lịch hẹn đã hoàn tất</h3>
+    <ul id="listChiTietCa"></ul>
+
+    <h3>Lịch sử yêu cầu</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Ngày tạo</th>
+          <th>Số ca</th>
+          <th>Số tiền</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody id="lichSuLuongBody"></tbody>
+    </table>
+  </div>
+
+  <script src="../../JS/chuyenGia/yeuCauLuong.js"></script>
+</body>
+</html>

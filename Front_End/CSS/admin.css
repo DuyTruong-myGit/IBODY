@@ -122,3 +122,32 @@
   display: flex;
   justify-content: space-between;
 }
+
+
+
+.container {
+  padding: 20px;
+  font-family: Arial;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+button {
+  padding: 5px 10px;
+  margin: 2px;
+  cursor: pointer;
+}

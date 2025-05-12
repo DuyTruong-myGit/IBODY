@@ -73,7 +73,7 @@ namespace IBODY_WebAPI.Controllers
         {
             var goi = await _context.GoiDangKies
                 .Include(g => g.GoiDichVu)
-                .Where(g => g.TaiKhoanId == taiKhoanId && g.NgayKetThuc >= DateTime.Today)
+                .Where(g => g.TaiKhoanId == taiKhoanId && g.NgayKetThuc >= DateTime.Today  && g.TrangThai == "con_hieu_luc")
                 .OrderByDescending(g => g.NgayKetThuc)
                 .Select(g => new
                 {

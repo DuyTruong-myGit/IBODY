@@ -169,15 +169,6 @@ CREATE TABLE goi_dang_ky (
   trang_thai VARCHAR(20) CHECK (trang_thai IN ('con_hieu_luc', 'het_hieu_luc')) DEFAULT 'con_hieu_luc'
 );
 
-CREATE TABLE luong_chuyen_gia (
-  id INT IDENTITY(1,1) PRIMARY KEY,
-  chuyen_gia_id INT FOREIGN KEY REFERENCES chuyen_gia(id),
-  so_buoi INT,
-  luong_mot_buoi DECIMAL(10,2),
-  tong_luong DECIMAL(10,2),
-  thang INT,
-  nam INT
-);
 
 
 INSERT INTO AspNetRoles (Id, Name, NormalizedName)
@@ -215,6 +206,40 @@ ALTER TABLE nguoi_dung ADD avatar_url NVARCHAR(255);
 ALTER TABLE chuyen_gia ADD avatar_url NVARCHAR(255);
 
 
+ALTER TABLE tai_khoan ADD reset_token NVARCHAR(255),reset_token_expiry DATETIME;
+
+CREATE TABLE YeuCauNhanLuong (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ChuyenGiaId INT NOT NULL,
+    SoCa INT NOT NULL,
+    SoTien DECIMAL(18,2) NOT NULL,
+    NgayTao DATETIME DEFAULT GETDATE(),
+    TrangThai NVARCHAR(20) DEFAULT 'dang_cho', -- dang_cho / da_duyet / tu_choi
+    FOREIGN KEY (ChuyenGiaId) REFERENCES chuyen_gia(id)
+);
+ALTER TABLE chuyen_gia
+ADD so_tai_khoan NVARCHAR(50),
+    ten_ngan_hang NVARCHAR(255);
+
+
+CREATE TABLE YeuCauXacNhanGoiDichVu (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    TaiKhoanId INT NOT NULL,
+    GoiDichVuId INT NOT NULL,
+    NoiDungChuyenKhoan NVARCHAR(255), -- ví dụ: "user_12_goi_3"
+    TrangThai NVARCHAR(20) DEFAULT 'cho_duyet', -- 'cho_duyet' | 'da_duyet' | 'tu_choi'
+    NgayTao DATETIME DEFAULT GETDATE()
+);
+
+
+
+
+
+
+
+
+
+
 EXEC sp_help 'giao_dich';
 
 
@@ -230,6 +255,8 @@ SELECT * FROM tai_khoan WHERE email = 'admin@123.com'
 
 
 
+SELECT COUNT(*) FROM lich_hen 
+WHERE chuyen_gia_id = 7  AND trang_thai = 'da_hoan_tat'
 
 
 

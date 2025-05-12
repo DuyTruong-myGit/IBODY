@@ -233,9 +233,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ✅ Xử lý điều hướng và thao tác gói
-function chuyenTrangThanhToan(goiId) {
+async function chuyenTrangThanhToan(goiId) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const goiRes = await fetch(`http://localhost:5221/api/goi-dich-vu/dang-su-dung/${user.taiKhoanId}`);
+  const goiText = await goiRes.text();
+  let goiDangSuDung = null;
+
+  if (goiText && goiText !== "null") {
+    try {
+      const parsed = JSON.parse(goiText);
+      if (parsed && parsed.soLuotConLai > 0) {
+        const confirmMsg = `⚠️ Bạn vẫn còn ${parsed.soLuotConLai} lượt trong gói "${parsed.tenGoi}".\n`
+          + `Nếu bạn đăng ký gói mới, số lượt còn lại sẽ bị mất.\n\n`
+          + `Bạn có chắc chắn muốn tiếp tục không?`;
+
+        const ok = confirm(confirmMsg);
+        if (!ok) return;
+      }
+    } catch {
+      // không cần xử lý nếu không parse được
+    }
+  }
+
+  // Tiếp tục điều hướng
   window.location.href = `payment-methods.html?goiId=${goiId}`;
 }
+
 
 async function giaHanGoi(goiDichVuId) {
   chuyenTrangThanhToan(goiDichVuId);

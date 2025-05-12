@@ -31,6 +31,9 @@ namespace IBODY_WebAPI.Controllers
             cg.SoChungChi = dto.SoChungChi;
             cg.ChuyenMon = dto.ChuyenMon;
             cg.GioiThieu = dto.GioiThieu;
+            cg.SoTaiKhoan = dto.SoTaiKhoan;
+            cg.TenNganHang = dto.TenNganHang;
+
 
             await _context.SaveChangesAsync();
 
@@ -66,28 +69,6 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { message = "Đã cập nhật avatar", avatarUrl = cg.AvatarUrl });
         }
 
-
-
-
-        [HttpPut("doi-mat-khau/{taiKhoanId}")]
-        public async Task<IActionResult> DoiMatKhauChuyenGia(int taiKhoanId, [FromBody] DoiMatKhauDto dto)
-        {
-            var account = await _context.TaiKhoans.FindAsync(taiKhoanId);
-            if (account == null)
-                return NotFound(new { message = "Không tìm thấy tài khoản." });
-
-            // Kiểm tra mật khẩu cũ
-            if (!BCrypt.Net.BCrypt.Verify(dto.MatKhauCu, account.MatKhau))
-            {
-                return BadRequest(new { message = "Mật khẩu hiện tại không đúng." });
-            }
-
-            // Mã hóa và cập nhật mật khẩu mới
-            account.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhauMoi);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Đổi mật khẩu thành công!" });
-        }
 
 
         [HttpPost("guiTinNhan")]
@@ -217,8 +198,84 @@ namespace IBODY_WebAPI.Controllers
                 chuyenMon = chuyenGia.ChuyenMon,
                 gioiThieu = chuyenGia.GioiThieu,
                 soChungChi = chuyenGia.SoChungChi,
-                avatarUrl = chuyenGia.AvatarUrl
+                avatarUrl = chuyenGia.AvatarUrl,
+                soTaiKhoan = chuyenGia.SoTaiKhoan,
+                tenNganHang = chuyenGia.TenNganHang
+
             });
+        }
+
+        [HttpGet("nhan-luong/{taiKhoanId}")]
+        public async Task<IActionResult> ThongTinLuongChuyenGia(int taiKhoanId)
+        {
+            var chuyenGia = await _context.ChuyenGia.FirstOrDefaultAsync(c => c.TaiKhoanId == taiKhoanId);
+            if (chuyenGia == null) return NotFound("Không tìm thấy chuyên gia.");
+
+            const decimal donGiaCa = 500000;
+
+            var soCa = await _context.LichHens
+                .CountAsync(lh => lh.ChuyenGiaId == chuyenGia.Id && lh.TrangThai == "da_hoan_tat");
+
+            var lich = await _context.LichHens
+                .Where(lh => lh.ChuyenGiaId == chuyenGia.Id && lh.TrangThai == "da_hoan_tat")
+                .Select(lh => new {
+                    lh.Id,
+                    lh.ThoiGianBatDau,
+                    lh.ThoiGianKetThuc,
+                    lh.TomTat
+                }).ToListAsync();
+
+            var luongLichSu = await _context.YeuCauNhanLuongs
+                .Where(x => x.ChuyenGiaId == chuyenGia.Id)
+                .OrderByDescending(x => x.NgayTao)
+                .Select(x => new {
+                    x.Id,
+                    x.SoCa,
+                    x.SoTien,
+                    x.NgayTao,
+                    x.TrangThai
+                }).ToListAsync();
+
+            return Ok(new {
+                tongCa = soCa,
+                donGia = donGiaCa,
+                tongTien = soCa * donGiaCa,
+                chiTietCa = lich,
+                lichSuNhanLuong = luongLichSu
+            });
+        }
+
+        [HttpPost("gui-yeu-cau-nhan-luong")]
+        public async Task<IActionResult> GuiYeuCauNhanLuong([FromBody] int taiKhoanId)
+        {
+            var chuyenGia = await _context.ChuyenGia.FirstOrDefaultAsync(c => c.TaiKhoanId == taiKhoanId);
+            if (chuyenGia == null) return NotFound("Không tìm thấy chuyên gia.");
+
+            var soCa = await _context.LichHens
+                .CountAsync(lh => lh.ChuyenGiaId == chuyenGia.Id && lh.TrangThai == "da_hoan_tat");
+
+            if (soCa == 0)
+                return BadRequest("Bạn chưa có buổi tư vấn nào hoàn tất để nhận lương.");
+
+            const decimal donGiaCa = 500000;
+
+            var yeuCau = new YeuCauNhanLuong {
+                ChuyenGiaId = chuyenGia.Id,
+                SoCa = soCa,
+                SoTien = soCa * donGiaCa,
+                TrangThai = "dang_cho",
+                NgayTao = DateTime.Now
+            };
+
+            _context.YeuCauNhanLuongs.Add(yeuCau);
+            await _context.SaveChangesAsync();
+
+            return Ok(new {
+                message = "Đã gửi yêu cầu nhận lương. Vui lòng chờ xét duyệt.",
+                soTaiKhoan = chuyenGia.SoTaiKhoan,
+                tenNganHang = chuyenGia.TenNganHang
+            });
+
         }
 
 
@@ -226,14 +283,17 @@ namespace IBODY_WebAPI.Controllers
     }
 
 
-    public class CapNhatChuyenGiaDto
-    {
-        public string HoTen { get; set; } = null!;
-        public int SoNamKinhNghiem { get; set; }
-        public string SoChungChi { get; set; } = null!;
-        public string ChuyenMon { get; set; } = null!;
-        public string GioiThieu { get; set; } = null!;
-    }
+   public class CapNhatChuyenGiaDto
+{
+    public string HoTen { get; set; } = null!;
+    public int SoNamKinhNghiem { get; set; }
+    public string SoChungChi { get; set; } = null!;
+    public string ChuyenMon { get; set; } = null!;
+    public string GioiThieu { get; set; } = null!;
+    public string? SoTaiKhoan { get; set; }
+    public string? TenNganHang { get; set; }
+}
+
 
     public class DoiMatKhauDto
 {

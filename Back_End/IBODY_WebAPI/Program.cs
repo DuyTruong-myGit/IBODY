@@ -43,6 +43,8 @@ builder.Services.AddControllers();
 // ✅ Add Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 BadWordsFilter.Load("Configs/badwords.json");
 

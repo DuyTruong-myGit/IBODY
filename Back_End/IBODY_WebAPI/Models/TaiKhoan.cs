@@ -15,6 +15,10 @@ public partial class TaiKhoan
 
     public string? TrangThai { get; set; }
 
+    public string? ResetToken { get; set; }
+
+    public DateTime? ResetTokenExpiry { get; set; }
+
     public virtual ICollection<BaoCaoViPham> BaoCaoViPhams { get; set; } = new List<BaoCaoViPham>();
 
     public virtual ICollection<ChuyenGium> ChuyenGia { get; set; } = new List<ChuyenGium>();

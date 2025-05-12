@@ -13,5 +13,4 @@ public partial class TheChuyenGium
 
     public virtual ChuyenGium? ChuyenGia { get; set; }
 
-    public virtual The? The { get; set; }
 }

@@ -114,3 +114,8 @@ async function huyLich(id) {
     alert("Lỗi khi hủy lịch.");
   }
 }
+
+function logout() {
+  localStorage.removeItem("user");
+  window.location.href = "../index.html";
+}

@@ -30,7 +30,7 @@
     <button class="tab-btn active" data-tab="info">Thông tin hiện tại</button>
     <button class="tab-btn" data-tab="edit">Chỉnh sửa thông tin</button>
     <button class="tab-btn" data-tab="schedule">Thời gian rảnh</button>
-    <button class="tab-btn" data-tab="password">Đổi mật khẩu</button>
+    
   </div>
 
   <div class="tab-content active" id="info">
@@ -42,6 +42,8 @@
     <p><strong>Số năm kinh nghiệm:</strong> <span id="cgExperience"></span></p>
     <p><strong>Số chứng chỉ:</strong> <span id="cgCertificates"></span></p>
     <p><strong>Giới thiệu:</strong> <span id="cgIntro"></span></p>
+    <p><strong>Số tài khoản:</strong> <span id="cgSoTaiKhoan"></span></p>
+    <p><strong>Tên ngân hàng:</strong> <span id="cgTenNganHang"></span></p>
   </div>
 
   <div class="tab-content" id="edit">
@@ -55,20 +57,13 @@
       <input type="number" id="editExperience" placeholder="Số năm kinh nghiệm" required>
       <input type="text" id="editCertificates" placeholder="Số chứng chỉ" required>
       <textarea id="editIntro" placeholder="Giới thiệu bản thân" required></textarea>
+      <input type="text" id="editSoTaiKhoan" placeholder="Số tài khoản ngân hàng">
+      <input type="text" id="editTenNganHang" placeholder="Tên ngân hàng">
       <button type="submit">Cập nhật</button>
     </form>
     <div id="editResult"></div>
   </div>
 
-  <div class="tab-content" id="password">
-    <h3>Đổi mật khẩu</h3>
-    <form id="passwordForm">
-      <input type="password" id="oldPassword" placeholder="Mật khẩu hiện tại" required>
-      <input type="password" id="newPassword" placeholder="Mật khẩu mới" required>
-      <button type="submit">Đổi mật khẩu</button>
-    </form>
-    <div id="passwordResult"></div>
-  </div>
 
   <div class="tab-content" id="schedule">
   <h3>Thời gian rảnh</h3>

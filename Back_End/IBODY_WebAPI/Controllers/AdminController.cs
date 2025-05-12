@@ -512,6 +512,52 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new { count });
         }
 
+        [HttpGet("yeu-cau-nhan-luong")]
+        public async Task<IActionResult> DanhSachYeuCauNhanLuong()
+        {
+            var list = await _context.YeuCauNhanLuongs
+                .Include(y => y.ChuyenGia)
+                .ThenInclude(cg => cg.TaiKhoan)
+                .OrderByDescending(y => y.NgayTao)
+                .ToListAsync();
+
+            return Ok(list.Select(y => new {
+                y.Id,
+                y.ChuyenGia.HoTen,
+                Email = y.ChuyenGia.TaiKhoan.Email,
+                y.SoCa,
+                y.SoTien,
+                y.NgayTao,
+                y.TrangThai,
+                y.ChuyenGia.SoTaiKhoan,
+                y.ChuyenGia.TenNganHang
+
+            }));
+        }
+
+        [HttpPost("duyet-yeu-cau-luong/{id}")]
+        public async Task<IActionResult> DuyetYeuCau(int id)
+        {
+            var yc = await _context.YeuCauNhanLuongs.FindAsync(id);
+            if (yc == null) return NotFound();
+
+            yc.TrangThai = "da_duyet";
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã duyệt yêu cầu nhận lương." });
+        }
+
+        [HttpPost("tu-choi-yeu-cau-luong/{id}")]
+        public async Task<IActionResult> TuChoiYeuCau(int id)
+        {
+            var yc = await _context.YeuCauNhanLuongs.FindAsync(id);
+            if (yc == null) return NotFound();
+
+            yc.TrangThai = "tu_choi";
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã từ chối yêu cầu nhận lương." });
+        }
+
+
 
     }
 

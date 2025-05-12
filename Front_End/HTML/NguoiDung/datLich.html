@@ -4,59 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Đặt lịch tư vấn</title>
-  <link rel="stylesheet" href="../../CSS/NguoiDung/payment-methods.css">
+  <link rel="stylesheet" href="../../CSS/NguoiDung/datLich.css">
 </head>
 <body>
-  <div class="payment-method-container">
-    <h2>Đặt lịch tư vấn</h2>
-    <div class="payment-wrapper">
-      <!-- Panel trái -->
-      <div class="left-panel">
-        <h3>Thông tin người dùng</h3>
-        <form id="bookingForm">
-          <label for="fullName">Họ tên:</label>
-          <input type="text" id="fullName" required>
+  <div class="container">
+    <h2>Đặt lịch tư vấn với chuyên gia</h2>
 
-          <label for="phone">Số điện thoại:</label>
-          <input type="tel" id="phone" required>
-
-          <label for="email">Email:</label>
-          <input type="email" id="email" required>
-
-          <label for="bookingTime">Chọn thời gian bắt đầu:</label>
-          <input type="datetime-local" id="bookingTime" required>
-
-          <label for="duration">Chọn gói thời lượng:</label>
-          <select id="duration" required>
-            <option value="">-- Chọn gói --</option>
-            <option value="60">1 giờ</option>
-            <option value="90">1 giờ 30 phút</option>
-            <option value="120">2 giờ</option>
-            <option value="180">3 giờ</option>
-          </select>
-
-          <label for="hinhThucId">Hình thức tư vấn:</label>
-          <select id="hinhThucId" required>
-            <option value="">-- Chọn hình thức --</option>
-            <!-- JS sẽ load từ API -->
-          </select>
-
-          <label for="notes">Ghi chú (nếu có):</label>
-          <textarea id="notes"></textarea>
-
-          <div class="payment-confirm">
-            <button type="submit" class="btn-primary">Gửi yêu cầu đặt lịch</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Panel phải -->
-      <div class="right-panel">
-        <h3>Thông tin chuyên gia và gói khám</h3>
-        <div class="info-card"></div>
-        <div class="info-card"></div>
-      </div>
+    <div class="info-card" id="userInfoCard">
+      <h4>Thông tin người dùng</h4>
+      <p><strong>Họ tên:</strong> <input type="text" id="fullName" disabled></p>
+      <p><strong>Email:</strong> <input type="email" id="email" disabled></p>
+      <p><strong>SĐT:</strong> <input type="text" id="phone" disabled></p>
     </div>
+
+    <div class="info-card" id="expertInfoCard">
+      <h4>Thông tin chuyên gia</h4>
+      <p id="expertName"></p>
+      <p id="expertChuyenMon"></p>
+      <p id="expertDanhGia"></p>
+      <p id="expertGioiThieu"></p>
+    </div>
+
+<form id="bookingForm">
+
+      <label for="ngay">Chọn ngày:</label>
+      <input type="date" id="ngay" required>
+
+      <label for="slot">Chọn khung giờ trống:</label>
+      <div id="slotContainer"></div>
+
+      <label for="hinhThucId">Hình thức tư vấn:</label>
+      <select id="hinhThucId" required></select>
+
+      <label for="soCa">Số ca liên tiếp:</label>
+      <select id="soCa">
+        <option value="1">1 ca</option>
+        <option value="2">2 ca</option>
+        <option value="3">3 ca</option>
+      </select>
+
+      <label for="notes">Tóm tắt nội dung:</label>
+      <textarea id="notes" rows="3" required></textarea>
+
+      <button type="submit">Đặt lịch</button>
+    </form>
   </div>
 
   <script src="../../JS/NguoiDung/datLich.js"></script>
