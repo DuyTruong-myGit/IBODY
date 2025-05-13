@@ -6,6 +6,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+
+  const loginLink = document.getElementById("loginLink");
+  const userMenu = document.getElementById("userMenu");
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const avatarImg = document.querySelector(".user-button img");
+
+  if (loginLink && userMenu && usernameDisplay) {
+    loginLink.style.display = "none";
+    userMenu.style.display = "inline-block";
+    usernameDisplay.innerText = user.fullName || user.username;
+
+    if (avatarImg) {
+      avatarImg.src = user.avatarUrl
+        ? `http://localhost:5221${user.avatarUrl}`
+        : "../../img/default-avatar.png";
+    }
+  } else {
+    if (userMenu) userMenu.style.display = "none";
+  }
+
   const tableBody = document.querySelector("#historyTable tbody");
   const apiUrl = `http://localhost:5221/api/user/lich-su-goi/${user.taiKhoanId}`;
 
@@ -37,3 +57,31 @@ data.forEach(row => {
     tableBody.innerHTML = "<tr><td colspan='7'>Không thể tải dữ liệu. Vui lòng thử lại sau.</td></tr>";
   }
 });
+
+// Dropdown user
+function toggleUserDropdown() {
+  const dropdown = document.getElementById("userDropdown");
+  dropdown.classList.toggle("show");
+}
+
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("userMenu");
+  const dropdown = document.getElementById("userDropdown");
+  if (!menu.contains(e.target)) {
+    dropdown.classList.remove("show");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("menu-toggle");
+  const nav = document.querySelector(".nav");
+  toggleBtn?.addEventListener("click", () => {
+    nav.classList.toggle("open");
+  });
+});
+
+function logout() {
+  localStorage.removeItem("user");
+  alert("Đăng xuất thành công!");
+  window.location.href = "../index.html";
+}

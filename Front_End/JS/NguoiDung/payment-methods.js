@@ -8,6 +8,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("Thiếu thông tin người dùng hoặc gói dịch vụ.");
     return;
   }
+  const loginLink = document.getElementById("loginLink");
+  const userMenu = document.getElementById("userMenu");
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const avatarImg = document.querySelector(".user-button img");
+
+  if (loginLink && userMenu && usernameDisplay) {
+    loginLink.style.display = "none";
+    userMenu.style.display = "inline-block";
+    usernameDisplay.innerText = user.fullName || user.username;
+
+    if (avatarImg) {
+      avatarImg.src = user.avatarUrl
+        ? `http://localhost:5221${user.avatarUrl}`
+        : "../../img/default-avatar.png";
+    }
+  } else {
+    if (userMenu) userMenu.style.display = "none";
+  }
+
+
+
 
   try {
     const res = await fetch(`${BASE_API}/api/goi-dich-vu/chi-tiet/${goiId}`);
@@ -48,3 +69,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("Không thể tải thông tin gói dịch vụ.");
   }
 });
+
+// Dropdown user
+function toggleUserDropdown() {
+  const dropdown = document.getElementById("userDropdown");
+  dropdown.classList.toggle("show");
+}
+
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("userMenu");
+  const dropdown = document.getElementById("userDropdown");
+  if (!menu.contains(e.target)) {
+    dropdown.classList.remove("show");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("menu-toggle");
+  const nav = document.querySelector(".nav");
+  toggleBtn?.addEventListener("click", () => {
+    nav.classList.toggle("open");
+  });
+});
+
+function logout() {
+  localStorage.removeItem("user");
+  alert("Đăng xuất thành công!");
+  window.location.href = "../index.html";
+}
