@@ -2,14 +2,16 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lịch hẹn của tôi</title>
-  <link rel="stylesheet" href="../../CSS/NguoiDung/lich-hen-user.css">
-  <link rel="stylesheet" href="../../CSS/index.css">
+  <title>Lịch sử gói đã đăng ký</title>
+  <link rel="stylesheet" href="../../CSS/NguoiDung/lichSuGoi.css">
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    th { background-color: #f0f0f0; }
+  </style>
 </head>
 <body>
-
-  <<header class="header">
+  <header class="header">
     <div class="logo">
       <span class="symbol">♂♀</span>
       <span class="brand">ibody</span>
@@ -45,25 +47,23 @@
     </nav>
 
   </header>
-      
-    </nav>
-  </header>
-   <div class="lich-hen-container">
-    <h2>Lịch hẹn của tôi</h2>
-    <div id="lichHenList">
-
-
-    </div>
-    
-    <h2>Lịch sử tư vấn của tôi</h2>
-    <div id="lichSuTuVanList">
-
-
-    </div> 
-
+  <div class="container">
+    <h2>Lịch sử các gói đã đăng ký</h2>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Tên gói</th>
+          <th>Giá</th>
+          <th>Ngày bắt đầu</th>
+          <th>Ngày kết thúc</th>
+          <th>Số lượt</th>
+          <th>Còn lại</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-  <script src="../../JS/NguoiDung/lich-hen-user.js"></script>
-
-
+  <script src="../../JS/NguoiDung/lichSuGoi.js"></script>
 </body>
 </html>

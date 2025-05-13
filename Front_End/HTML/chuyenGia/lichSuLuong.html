@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Lịch sử nhận lương</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fc;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    .summary {
+      background: #eaf4ff;
+      padding: 15px;
+      border-left: 4px solid #3498db;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      background: #2980b9;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background: #3498db;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Lịch sử nhận lương</h2>
+    <div class="summary" id="summaryBox">
+      <p><strong>Tổng ca hoàn tất:</strong> <span id="tongCa">0</span></p>
+      <p><strong>Đơn giá mỗi ca:</strong> <span id="donGia">0</span>₫</p>
+      <p><strong>Tổng tiền có thể nhận:</strong> <span id="tongTien">0</span>₫</p>
+      <button class="btn" id="guiYeuCauBtn">Gửi yêu cầu nhận lương</button>
+      <p id="thongBaoYeuCau" style="color: green; margin-top: 10px;"></p>
+    </div>
+
+    <h3>Lịch sử các lần nhận lương</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Ngày gửi</th>
+          <th>Số ca</th>
+          <th>Số tiền</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody id="lichSuTable">
+        <tr><td colspan="4">Đang tải dữ liệu...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="../../JS/chuyenGia/lichSuLuong.js"></script>
+</body>
+</html>

@@ -9,66 +9,61 @@
 </head>
 <body>
     <header class="header">
-        <div class="logo">
-          <span class="symbol">♂♀</span>
-          <span class="brand">ibody</span>
-        </div>
-        <nav class="nav">
-            <a href="../Index.html" class="active">Trang chủ</a>
-            <a href="https://www.facebook.com/groups/1717452315821331">Cộng Đồng</a>
-            <a href="search-expert.html">Tư vấn</a>
-            <a href="tin-nhan-user.html">Nhắn tin</a>
-            <a href="lich-hen-user.html">Lịch hẹn</a>
-            <a href="bill-popup.html">Bill sau khi thanh toán</a>
-            <a href="ho-tro-user.html">Hỗ trợ</a>
-
-            <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập/Đăng ký</a>
-            <div class="user-menu" id="userMenu" style="display: none;">
-                <div class="user-button" onclick="toggleUserDropdown()">
-                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="avatar">
-                    <span id="usernameDisplay"></span>
-                </div>
-                <div class="user-dropdown" id="userDropdown">
-                    <a href="profile.html">Trang cá nhân</a>
-                    <a href="../HTML/NguoiDung/settings-user.html">Cài đặt & quyền riêng tư</a>
-                    <a href="../HTML/NguoiDung/settings-upgrade.html">Nâng cấp thành chuyên gia</a>
-                    <a href="../HTML/NguoiDung/ho-tro-user.html">Hỗ trợ</a>
-                    <a href="#" onclick="logout()">Đăng xuất</a>
-                </div>
-            </div>
-        </nav>
-    </header>
- <div class="payment-container">
-    <h1>Thanh toán gói dịch vụ</h1>
-
-    <!-- Thông tin người dùng -->
-    <div class="info-card">
-      <h3>Thông tin người dùng</h3>
-      <p><strong>Họ tên:</strong> <span id="userFullName">...</span></p>
-      <p><strong>Email:</strong> <span id="userEmail">...</span></p>
+    <div class="logo">
+      <span class="symbol">♂♀</span>
+      <span class="brand">ibody</span>
     </div>
+    
+    <button id="menu-toggle" class="menu-toggle">☰</button>
+  
+      <nav class="nav">
+      <a href="../Index.html" class="active">Trang chủ</a>
+      <a href="https://www.facebook.com/groups/1717452315821331">Cộng Đồng</a>
+      <a href="search-expert.html">Tư vấn</a>
+      <a href="tin-nhan-user.html">Nhắn tin</a>
+      <a href="lich-hen-user.html">Lịch hẹn</a>
+      <a href="lichSuGoi.html">Lịch sử giao dịch</a>
+      <a href="dang-ky-goi.html">Gói tư vấn</a>
 
-    <!-- Thông tin gói -->
+
+      <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập/Đăng ký</a>
+      <div class="user-menu" id="userMenu" style="display: none;">
+        <div class="user-button" onclick="toggleUserDropdown()">
+          <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="avatar">
+          <span id="usernameDisplay"></span>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="../profile.html">Trang cá nhân</a>
+          <a href="settings-upgrade.html">Nâng cấp thành chuyên gia</a>
+          <a href="../../HTML/tracnghiem.html">Trắc nghiệm trầm cảm</a>
+          <a href="ho-tro-user.html">Hỗ trợ</a>
+          <a href="#" onclick="logout()">Đăng xuất</a>
+        </div>
+      </div>
+      
+    </nav>
+
+  </header>
+ <div class="container">
+    <h2>Thông tin thanh toán gói dịch vụ</h2>
+
     <div class="info-card">
       <h3>Thông tin gói</h3>
-      <div class="info-card">
-      <h3>Chuyển khoản đến tài khoản hệ thống</h3>
-      <p>Vui lòng quét mã QR dưới đây để chuyển khoản theo số tiền gói</p>
-      <img src="../../ThanhToan.png" alt="QR Code" style="max-width: 300px; width: 100%; height: auto;">
-      <p><strong>Lưu ý:</strong> Ghi rõ nội dung chuyển khoản là:
-      <code id="chuyenKhoanGhiChu">user_xxx_goi_xxx</code></p>
-      </div>
-      <p><strong>Tên gói:</strong> <span id="goiTen">...</span></p>
-      <p><strong>Mô tả:</strong> <span id="goiMoTa">...</span></p>
-      <p><strong>Giá:</strong> <span id="goiGia">...</span></p>
-      <p><strong>Thời hạn:</strong> <span id="goiThoiHan">...</span></p>
+      <p><strong>Tên gói:</strong> <span id="goiTen"></span></p>
+      <p><strong>Giá:</strong> <span id="goiGia"></span></p>
+      <p><strong>Thời hạn:</strong> <span id="goiThoiHan"></span></p>
+      <p><strong>Số lượt:</strong> <span id="goiSoLuot"></span></p>
     </div>
 
-    <!-- Form xác nhận -->
-    <form id="paymentForm">
-      <h3>Xác nhận thanh toán</h3>
-      <button type="submit" class="pay-btn">Xác nhận & Thanh toán</button>
-    </form>
+    <div class="info-card">
+      <h3>Chuyển khoản tới tài khoản hệ thống</h3>
+      <p>Vui lòng quét mã QR dưới đây để chuyển khoản đúng số tiền:</p>
+      <img src="../../ThanhToan.png" alt="QR Code" class="qr-code">
+      <p><strong>Nội dung chuyển khoản:</strong> <code id="chuyenKhoanGhiChu">user_xxx_goi_xxx</code></p>
+      <p><em>Lưu ý: bạn chỉ được kích hoạt gói sau khi admin xác nhận thanh toán.</em></p>
+    </div>
+
+    <button class="pay-btn">Tôi đã chuyển khoản</button>
   </div>
     <!-- footer -->
     <footer class="footer">

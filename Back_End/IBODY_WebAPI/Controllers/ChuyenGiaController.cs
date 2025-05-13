@@ -279,6 +279,24 @@ namespace IBODY_WebAPI.Controllers
         }
 
 
+        [HttpGet("chi-tiet-luong/{id}")]
+        public async Task<IActionResult> ChiTietLuong(int id)
+        {
+            var record = await _context.YeuCauNhanLuongs.FindAsync(id);
+            if (record == null)
+                return NotFound(new { message = "Không tìm thấy yêu cầu lương." });
+
+            return Ok(new {
+                record.SoCa,
+                DonGia = 500000,
+                SoTien = record.SoTien,
+                record.NgayTao,
+                record.TrangThai
+            });
+        }
+
+
+
 
     }
 

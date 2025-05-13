@@ -32,7 +32,7 @@ namespace IBODY_WebAPI.Controllers
         [HttpGet("accounts")]
         public async Task<IActionResult> GetAllAccounts()
         {
-            var identityUsers = _userManager.Users.ToList(); // từ Identity
+            var identityUsers = _userManager.Users.ToList(); 
             var taiKhoans = await _context.TaiKhoans.ToListAsync();
 
             var result = taiKhoans.Select(tk =>
@@ -556,6 +556,104 @@ namespace IBODY_WebAPI.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { message = "Đã từ chối yêu cầu nhận lương." });
         }
+
+
+
+        [HttpGet("yeu-cau-chuyen-khoan")]
+        public async Task<IActionResult> DanhSachYeuCauChuyenKhoan()
+        {
+            var list = await _context.YeuCauXacNhanGoiDichVus
+                .Where(y => y.TrangThai == "cho_duyet")
+                .OrderByDescending(y => y.NgayTao)
+                .Select(y => new {
+                    y.Id,
+                    y.TaiKhoanId,
+                    TenGoi = _context.GoiDichVus.FirstOrDefault(g => g.Id == y.GoiDichVuId)!.Ten,
+                    Email = _context.TaiKhoans.FirstOrDefault(t => t.Id == y.TaiKhoanId)!.Email,
+                    y.NoiDungChuyenKhoan,
+                    y.NgayTao
+                })
+                .ToListAsync();
+
+            return Ok(list);
+        }
+
+        [HttpPost("duyet-chuyen-khoan/{id}")]
+        public async Task<IActionResult> DuyetChuyenKhoan(int id)
+        {
+            var yc = await _context.YeuCauXacNhanGoiDichVus.FindAsync(id);
+            if (yc == null || yc.TrangThai != "cho_duyet")
+                return NotFound(new { message = "Yêu cầu không tồn tại hoặc đã xử lý." });
+
+            // Check: User đã có gói con_hieu_luc chưa?
+            var goiCon = await _context.GoiDangKies
+                .AnyAsync(g => g.TaiKhoanId == yc.TaiKhoanId && g.TrangThai == "con_hieu_luc");
+
+            if (goiCon)
+                return BadRequest(new { message = "Người dùng hiện đã có gói đang hoạt động." });
+
+            // Lấy gói gốc
+            var goi = await _context.GoiDichVus.FindAsync(yc.GoiDichVuId);
+            if (goi == null || goi.ThoiHanNgay == null || goi.SoLuot == null)
+                return BadRequest(new { message = "Gói dịch vụ không hợp lệ hoặc thiếu cấu hình." });
+
+            // Tạo gói mới
+            var now = DateTime.Now;
+            var dangKy = new GoiDangKy
+            {
+                TaiKhoanId = yc.TaiKhoanId,
+                GoiDichVuId = yc.GoiDichVuId,
+                NgayBatDau = now,
+                NgayKetThuc = now.AddDays(goi.ThoiHanNgay.Value),
+                SoLuotConLai = goi.SoLuot,
+                TrangThai = "con_hieu_luc"
+            };
+            _context.GoiDangKies.Add(dangKy);
+
+            yc.TrangThai = "da_duyet";
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "✅ Đã duyệt và kích hoạt gói dịch vụ." });
+        }
+
+
+        [HttpPost("tu-choi-chuyen-khoan/{id}")]
+        public async Task<IActionResult> TuChoiChuyenKhoan(int id)
+        {
+            var yc = await _context.YeuCauXacNhanGoiDichVus.FindAsync(id);
+            if (yc == null)
+                return NotFound(new { message = "Không tìm thấy yêu cầu." });
+
+            if (yc.TrangThai != "cho_duyet")
+                return BadRequest(new { message = "Yêu cầu này đã được xử lý trước đó." });
+
+            yc.TrangThai = "tu_choi";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "❌ Đã từ chối yêu cầu xác nhận chuyển khoản." });
+        }
+
+        [HttpGet("lich-su-chuyen-khoan")]
+        public async Task<IActionResult> GetLichSuChuyenKhoan()
+        {
+            var lichSuList = await _context.YeuCauXacNhanGoiDichVus
+                .Where(y => y.TrangThai == "da_duyet")
+                .OrderByDescending(y => y.NgayTao)
+                .Select(y => new
+                {
+                    y.Id,
+                    y.TaiKhoanId,
+                    TenGoi = _context.GoiDichVus.FirstOrDefault(g => g.Id == y.GoiDichVuId).Ten,
+                    Email = _context.TaiKhoans.FirstOrDefault(t => t.Id == y.TaiKhoanId).Email,
+                    y.NoiDungChuyenKhoan,
+                    y.NgayTao
+                })
+                .ToListAsync();
+
+            return Ok(lichSuList);
+        }
+
 
 
 

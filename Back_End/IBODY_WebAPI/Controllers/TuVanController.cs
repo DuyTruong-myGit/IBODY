@@ -88,6 +88,7 @@ namespace IBODY_WebAPI.Controllers
             return Ok(new
             {
                 Id = expert.Id,
+                TaiKhoanId = expert.TaiKhoanId,
                 expert.HoTen,
                 expert.SoNamKinhNghiem,
                 expert.ChuyenMon,

@@ -13,13 +13,19 @@
       <span class="symbol">♂♀</span>
       <span class="brand">ibody</span>
     </div>
-    <nav class="nav">
-        <a href="../Index.html" >Trang chủ</a>
-        <a href="https://www.facebook.com/groups/1717452315821331">Cộng Đồng</a>
-        <a href="search-expert.html"class="active">Tư vấn</a>
-        <a href="tin-nhan-user.html">Nhắn tin</a>
-        <a href="lich-hen-user.html">Lịch hẹn</a>
-        <a href="bill-popup.html">Bill sau khi tthanh toán</a>
+    
+    <button id="menu-toggle" class="menu-toggle">☰</button>
+  
+      <nav class="nav">
+      <a href="../Index.html" class="active">Trang chủ</a>
+      <a href="https://www.facebook.com/groups/1717452315821331">Cộng Đồng</a>
+      <a href="search-expert.html">Tư vấn</a>
+      <a href="tin-nhan-user.html">Nhắn tin</a>
+      <a href="lich-hen-user.html">Lịch hẹn</a>
+      <a href="lichSuGoi.html">Lịch sử giao dịch</a>
+      <a href="dang-ky-goi.html">Gói tư vấn</a>
+
+
       <a href="#" id="loginLink" onclick="openAuthModal()">Đăng nhập/Đăng ký</a>
       <div class="user-menu" id="userMenu" style="display: none;">
         <div class="user-button" onclick="toggleUserDropdown()">
@@ -28,24 +34,31 @@
         </div>
         <div class="user-dropdown" id="userDropdown">
           <a href="../profile.html">Trang cá nhân</a>
-          <a href="./settings-upgrade.html">Nâng cấp thành chuyên gia</a>
-          <a href="./ho-tro-user.html">Hỗ trợ</a>
+          <a href="settings-upgrade.html">Nâng cấp thành chuyên gia</a>
+          <a href="../../HTML/tracnghiem.html">Trắc nghiệm trầm cảm</a>
+          <a href="ho-tro-user.html">Hỗ trợ</a>
           <a href="#" onclick="logout()">Đăng xuất</a>
         </div>
       </div>
+      
     </nav>
-  </header>
 
+  </header>
 <div class="expert-container">
     <!-- Header -->
     <div class="expert-header">
-      <img src="../img/user-icon.png" alt="Avatar" class="expert-avatar">
+      <img  class="expert-avatar" />
       <div class="expert-info">
         <h2 id="expertName">Tên chuyên gia</h2>
         <p id="expertEmail" class="expert-title">email@vd.com</p>
         <p class="expert-rating">⭐</p>
+
+        <!-- Nút hành động -->
+        <div class="expert-actions">
+          <button class="btn-book" onclick="datLich()">Đặt lịch hẹn</button>
+          <button id="openReportModalBtn" class="report-btn">Tố cáo chuyên gia</button>
+        </div>
       </div>
-      <button class="btn-book" onclick="datLich()">Đặt lịch hẹn</button>
     </div>
 
     <!-- Tabs -->
@@ -83,6 +96,17 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal tố cáo -->
+  <div id="reportModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Tố cáo chuyên gia</h2>
+      <textarea id="reportReason" placeholder="Nhập lý do tố cáo..." required></textarea>
+      <button id="submitReportBtn">Gửi báo cáo</button>
+    </div>
+  </div>
+
 
   <!-- footer -->
   <footer class="footer">

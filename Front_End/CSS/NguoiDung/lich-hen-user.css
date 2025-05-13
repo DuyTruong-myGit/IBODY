@@ -38,3 +38,25 @@
 .pay-button:hover {
   background-color: #0056b3;
 }
+
+
+
+
+.lich-hen-container {
+  margin-top: 20px;
+}
+
+.lich-hen-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.highlight {
+  background-color: #ffeb3b;
+}
+
+.lich-qua {
+  background-color: #f5f5f5;
+}

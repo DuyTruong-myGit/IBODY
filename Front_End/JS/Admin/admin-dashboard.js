@@ -35,3 +35,32 @@ document.getElementById("logoutLink")?.addEventListener("click", () => {
   localStorage.removeItem("user");
   window.location.href = "../index.html";
 });
+
+
+
+
+// động giao diện
+document.addEventListener("DOMContentLoaded", function () {
+  // Giả lập dữ liệu mẫu
+  const stats = {
+    countUsers: 128,
+    countExperts: 42,
+    countUpgrade: 5,
+    countAppointments: 66,
+    countReports: 12
+  };
+
+  // Cập nhật DOM
+  for (let key in stats) {
+    const el = document.getElementById(key);
+    if (el) el.textContent = stats[key];
+  }
+
+  // Hiệu ứng nạp động (ví dụ, có thể dùng spinner thực tế nếu gọi API)
+  const loadingSections = document.querySelectorAll(".section p");
+  loadingSections.forEach(p => {
+    setTimeout(() => {
+      p.textContent = "Dữ liệu đã được tải.";
+    }, 1500);
+  });
+});

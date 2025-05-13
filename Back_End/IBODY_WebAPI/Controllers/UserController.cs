@@ -249,8 +249,70 @@ namespace IBODY_WebAPI.Controllers
             };
 
             _context.YeuCauXacNhanGoiDichVus.Add(yeuCau);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lưu vào cơ sở dữ liệu.", error = ex.Message });
+            }
             return Ok(new { message = "Đã gửi yêu cầu xác nhận chuyển khoản." });
+        }
+
+
+
+        [HttpGet("lich-su-goi/{taiKhoanId}")]
+        public async Task<IActionResult> LichSuGoiDangKy(int taiKhoanId)
+        {
+            var lichSu = await _context.GoiDangKies
+                .Include(g => g.GoiDichVu)
+                .Where(g => g.TaiKhoanId == taiKhoanId)
+                .OrderByDescending(g => g.NgayBatDau)
+                .Select(g => new {
+                    g.Id,
+                    TenGoi = g.GoiDichVu.Ten,
+                    Gia = g.GoiDichVu.Gia,
+                    NgayBatDau = g.NgayBatDau,
+                    NgayKetThuc = g.NgayKetThuc,
+                    SoLuot = g.GoiDichVu.SoLuot,
+                    SoLuotConLai = g.SoLuotConLai,
+                    TrangThai = g.TrangThai
+                })
+                .ToListAsync();
+
+            return Ok(lichSu);
+        }
+
+        // lấy chi tiết hóa đơn gói
+        [HttpGet("goi-dang-ky/{id}")]
+        public async Task<IActionResult> LayChiTietGoiDangKy(int id)
+        {
+            var goi = await _context.GoiDangKies
+                .Include(g => g.GoiDichVu)
+                .Include(g => g.TaiKhoan)
+                .Where(g => g.Id == id)
+                .Select(g => new
+                {
+                    g.Id,
+                    TenGoi = g.GoiDichVu.Ten,
+                    Gia = g.GoiDichVu.Gia,
+                    NgayBatDau = g.NgayBatDau,
+                    NgayKetThuc = g.NgayKetThuc,
+                    SoLuot = g.GoiDichVu.SoLuot,
+                    SoLuotConLai = g.SoLuotConLai,
+                    TrangThai = g.TrangThai,
+                    NguoiDung = new {
+                        g.TaiKhoan.Id,
+                        g.TaiKhoan.Email
+                    }
+                })
+                .FirstOrDefaultAsync();
+
+            if (goi == null)
+                return NotFound(new { message = "Không tìm thấy gói đăng ký." });
+
+            return Ok(goi);
         }
 
 
@@ -301,16 +363,6 @@ public class YeuCauXacNhanDto
 {
     public int TaiKhoanId { get; set; }
     public int GoiDichVuId { get; set; }
-}
-
-public class YeuCauXacNhanGoiDichVu
-{
-    public int Id { get; set; }
-    public int TaiKhoanId { get; set; }
-    public int GoiDichVuId { get; set; }
-    public string NoiDungChuyenKhoan { get; set; } = null!;
-    public string TrangThai { get; set; } = "cho_duyet";
-    public DateTime NgayTao { get; set; } = DateTime.Now;
 }
 
 

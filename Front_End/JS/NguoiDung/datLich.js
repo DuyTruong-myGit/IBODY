@@ -5,6 +5,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   const chuyenGiaId = new URLSearchParams(window.location.search).get("chuyenGiaId");
   if (!user || !chuyenGiaId) return alert("Thiếu thông tin đăng nhập hoặc chuyên gia.");
 
+  const loginLink = document.getElementById("loginLink");
+  const userMenu = document.getElementById("userMenu");
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const avatarImg = document.querySelector(".user-button img");
+
+  if (loginLink && userMenu && usernameDisplay) {
+    loginLink.style.display = "none";
+    userMenu.style.display = "inline-block";
+    usernameDisplay.innerText = user.fullName || user.username;
+
+    if (avatarImg) {
+      avatarImg.src = user.avatarUrl
+        ? `http://localhost:5221${user.avatarUrl}`
+        : "../../img/default-avatar.png";
+    }
+  } else {
+    if (userMenu) userMenu.style.display = "none";
+  }
+
+
   // 1. Load thông tin người dùng
   const userRes = await fetch(`${BASE_API}/api/user/profile/${user.taiKhoanId}`);
   const userData = await userRes.json();
@@ -106,3 +126,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
+// ✅ Dropdown menu
+function toggleUserDropdown() {
+  const dropdown = document.getElementById("userDropdown");
+  dropdown.classList.toggle("show");
+}
+
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("userMenu");
+  const dropdown = document.getElementById("userDropdown");
+  if (menu && !menu.contains(e.target)) {
+    dropdown.classList.remove("show");
+  }
+});
+
+// ✅ Logout
+function logout() {
+  localStorage.removeItem("user");
+  alert("Đăng xuất thành công!");
+  window.location.href = "./index.html";
+}

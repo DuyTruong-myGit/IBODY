@@ -1,34 +1,31 @@
+const BASE_API = "http://localhost:5221";
+
 document.addEventListener("DOMContentLoaded", async () => {
   const user = JSON.parse(localStorage.getItem("user"));
-    if (!user){
-    alert("Vui lòng đăng nhập để tiếp tục.");
-    return window.location.href = "../index.html";} 
-
   const goiId = new URLSearchParams(window.location.search).get("goiId");
-  if (!goiId) return alert("Không xác định được gói dịch vụ.");
 
-  // Hiển thị thông tin người dùng
-  document.getElementById("userFullName").textContent = user.fullName || "Không rõ";
-  document.getElementById("userEmail").textContent = user.email;
+  if (!user || !goiId) {
+    alert("Thiếu thông tin người dùng hoặc gói dịch vụ.");
+    return;
+  }
 
   try {
-    // ✅ Gọi API lấy chi tiết gói
-    const res = await fetch(`http://localhost:5221/api/goi-dich-vu/chi-tiet/${goiId}`);
-    const goi = await res.json();
+    const res = await fetch(`${BASE_API}/api/goi-dich-vu/chi-tiet/${goiId}`);
+    const text = await res.text();
+    if (!res.ok) throw new Error("Không tìm thấy gói dịch vụ.");
+    const goi = JSON.parse(text);
 
-    // ✅ Hiển thị gói
+    // Hiển thị thông tin gói
     document.getElementById("goiTen").textContent = goi.ten;
-    document.getElementById("goiMoTa").textContent = goi.moTa;
-    document.getElementById("goiGia").textContent = Number(goi.gia).toLocaleString() + "₫";
+    document.getElementById("goiGia").textContent = `${goi.gia.toLocaleString()}₫`;
     document.getElementById("goiThoiHan").textContent = `${goi.thoiHanNgay} ngày`;
-    document.getElementById("chuyenKhoanGhiChu").textContent =`user_${user.taiKhoanId}_goi_${goi.id}`;
+    document.getElementById("goiSoLuot").textContent = `${goi.soLuot} lượt tư vấn`;
+    document.getElementById("chuyenKhoanGhiChu").textContent = `user_${user.taiKhoanId}_goi_${goi.id}`;
 
-
-    // ✅ Khi bấm xác nhận thanh toán
-    document.getElementById("paymentForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    // Khi bấm "Tôi đã chuyển khoản"
+    document.querySelector(".pay-btn").addEventListener("click", async () => {
       try {
-        const res2 = await fetch("http://localhost:5221/api/goi-dich-vu/dang-ky", {
+        const res2 = await fetch(`${BASE_API}/api/user/yeu-cau-chuyen-khoan`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -37,18 +34,17 @@ document.addEventListener("DOMContentLoaded", async () => {
           })
         });
 
-        const text = await res2.text();
-        const data = JSON.parse(text);
-        if (!res2.ok) return alert("❌ Lỗi đăng ký gói: " + (data.message || "Lỗi không xác định"));
+        const data = await res2.json();
+        if (!res2.ok) throw new Error(data.message || "Gửi yêu cầu thất bại");
 
-        alert("✅ Thanh toán & đăng ký gói thành công!");
-        window.location.href = "dang-ky-goi.html";
+        alert("✅ Yêu cầu xác nhận đã được gửi. Vui lòng chờ admin duyệt!");
+        window.location.href = "lichSuGoi"; // hoặc chuyển về trang chính
       } catch (err) {
-        alert("❌ Lỗi khi thanh toán: " + err.message);
+        alert("❌ " + err.message);
       }
     });
-
   } catch (err) {
-    alert("❌ Không thể tải thông tin gói: " + err.message);
+    console.error("Lỗi tải gói:", err);
+    alert("Không thể tải thông tin gói dịch vụ.");
   }
 });

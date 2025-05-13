@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using IBODY_WebAPI.Controllers;
 
 namespace IBODY_WebAPI.Models;
 
@@ -15,7 +14,7 @@ public partial class FinalIbodyContext : DbContext
         : base(options)
     {
     }
-    
+
     public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
 
     public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
@@ -61,7 +60,8 @@ public partial class FinalIbodyContext : DbContext
     public virtual DbSet<TinNhan> TinNhans { get; set; }
 
     public virtual DbSet<YeuCauNhanLuong> YeuCauNhanLuongs { get; set; }
-    public DbSet<YeuCauXacNhanGoiDichVu> YeuCauXacNhanGoiDichVus { get; set; } = null!;
+
+    public virtual DbSet<YeuCauXacNhanGoiDichVu> YeuCauXacNhanGoiDichVus { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -557,6 +557,21 @@ public partial class FinalIbodyContext : DbContext
                 .HasForeignKey(d => d.ChuyenGiaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__YeuCauNha__Chuye__4B7734FF");
+        });
+
+        modelBuilder.Entity<YeuCauXacNhanGoiDichVu>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__YeuCauXa__3214EC074038CC71");
+
+            entity.ToTable("YeuCauXacNhanGoiDichVu");
+
+            entity.Property(e => e.NgayTao)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.NoiDungChuyenKhoan).HasMaxLength(255);
+            entity.Property(e => e.TrangThai)
+                .HasMaxLength(20)
+                .HasDefaultValue("cho_duyet");
         });
 
         OnModelCreatingPartial(modelBuilder);
