@@ -179,3 +179,9 @@ C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\Newtonsoft.J
 C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
 C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\MailKit.dll
 C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\MimeKit.dll
+C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\DnsClient.dll
+C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\MongoDB.Bson.dll
+C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\MongoDB.Driver.dll
+C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\SharpCompress.dll
+C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\Snappier.dll
+C:\Users\truon\Desktop\IBODY\Back_End\IBODY_WebAPI\bin\Debug\net9.0\ZstdSharp.dll

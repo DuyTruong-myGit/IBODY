@@ -207,3 +207,10 @@ themeBtn.addEventListener("click", () => {
     themeBtn.textContent = "🌙";
   }
 });
+
+
+function logout() {
+  localStorage.removeItem("user");
+  alert("Đăng xuất thành công!");
+  window.location.href = "../index.html";
+}

@@ -1,11 +1,10 @@
 const API_BASE_URL = "http://localhost:5221/api";
-const user = JSON.parse(localStorage.getItem("user"));
-    if (!user){
-    alert("Vui lòng đăng nhập để tiếp tục.");
-    return window.location.href = "../index.html";} 
+
+
 
 // ✅ Gộp xử lý hiển thị avatar + tên tài khoản sau khi đăng nhập
 document.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
   const loginLink = document.getElementById("loginLink");
   const userMenu = document.getElementById("userMenu");
   const usernameDisplay = document.getElementById("usernameDisplay");
@@ -89,6 +88,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+
+// Dropdown
+function toggleUserDropdown() {
+  const dropdown = document.getElementById("userDropdown");
+  dropdown?.classList.toggle("show");
+}
+
+document.addEventListener("click", (e) => {
+  const menu = document.getElementById("userMenu");
+  const dropdown = document.getElementById("userDropdown");
+  if (menu && !menu.contains(e.target)) {
+    dropdown?.classList.remove("show");
+  }
+});
+
+document.getElementById("menu-toggle")?.addEventListener("click", () => {
+  document.querySelector(".nav")?.classList.toggle("open");
+});
 
 
 function logout() {

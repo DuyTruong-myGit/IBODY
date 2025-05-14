@@ -10,7 +10,8 @@ async function loadDashboardStats() {
       fetch("http://localhost:5221/api/admin/demSoLuongChuyenGia"),
       fetch("http://localhost:5221/api/admin/lich-hen"),
       fetch("http://localhost:5221/api/admin/danhGiaCuaChuyenGia"),
-      fetch("http://localhost:5221/api/admin/bao-cao")
+      fetch("http://localhost:5221/api/admin/bao-cao"),
+      fetch("http://localhost:5221/api/admin/expert-requests")
     ]);
 
     const users = await resUsers.json();
@@ -24,6 +25,7 @@ async function loadDashboardStats() {
     document.getElementById("countAppointments").innerText = appointments.count || 0;
     document.getElementById("countReviews").innerText = reviews.count || 0;
     document.getElementById("countReports").innerText = reports.count || 0;
+    document.getElementById("countUpgrade").innerText = upgradeRequests.count || 0;
   } catch (err) {
     console.error("Lỗi tải thống kê:", err);
   }

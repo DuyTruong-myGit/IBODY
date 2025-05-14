@@ -12,8 +12,7 @@ namespace IBODY_WebAPI.Models
 
         public int FromUserId { get; set; }
         public int ToUserId { get; set; }
-        public string Content { get; set; }
+        public string Content { get; set; } = null!;
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public bool IsRead { get; set; } = false;
     }
 }
