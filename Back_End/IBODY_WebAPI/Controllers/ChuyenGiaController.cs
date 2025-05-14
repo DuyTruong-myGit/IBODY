@@ -4,6 +4,7 @@ using IBODY_WebAPI.Models;
 using IBODY_WebAPI.Helpers;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
+using IBODY_WebAPI.Services;
 namespace IBODY_WebAPI.Controllers
 {
     [ApiController]
@@ -11,10 +12,12 @@ namespace IBODY_WebAPI.Controllers
     public class ChuyenGiaController : ControllerBase
     {
         private readonly FinalIbodyContext _context;
+        private readonly ChatMessageService _chatMessageService;
 
-        public ChuyenGiaController(FinalIbodyContext context)
+        public ChuyenGiaController(FinalIbodyContext context,ChatMessageService chatMessageService)
         {
             _context = context;
+             _chatMessageService = chatMessageService;
         }
 
         //  API cập nhật thông tin hồ sơ chuyên gia
@@ -97,9 +100,16 @@ namespace IBODY_WebAPI.Controllers
                 return BadRequest(new { message = "Tin nhắn chứa từ ngữ không phù hợp." });
             }
 
+            // _context.TinNhans.Add(tinNhan);
+            // await _context.SaveChangesAsync();
 
-            _context.TinNhans.Add(tinNhan);
-            await _context.SaveChangesAsync();
+
+            await _chatMessageService.AddMessage(new ChatMessage {
+                FromUserId = dto.NguoiGuiId,
+                ToUserId = dto.NguoiNhanId,
+                Content = dto.NoiDung
+            });
+
 
             return Ok(new { message = "Đã gửi tin nhắn từ chuyên gia." });
         }
@@ -107,12 +117,14 @@ namespace IBODY_WebAPI.Controllers
         [HttpGet("lichSuTinNhan")]
         public async Task<IActionResult> LichSuTinNhan([FromQuery] int taiKhoan1, [FromQuery] int taiKhoan2)
         {
-            var lichSu = await _context.TinNhans
-                .Where(t =>
-                    (t.NguoiGuiId == taiKhoan1 && t.NguoiNhanId == taiKhoan2) ||
-                    (t.NguoiGuiId == taiKhoan2 && t.NguoiNhanId == taiKhoan1))
-                .OrderBy(t => t.ThoiGian)
-                .ToListAsync();
+            // var lichSu = await _context.TinNhans
+            //     .Where(t =>
+            //         (t.NguoiGuiId == taiKhoan1 && t.NguoiNhanId == taiKhoan2) ||
+            //         (t.NguoiGuiId == taiKhoan2 && t.NguoiNhanId == taiKhoan1))
+            //     .OrderBy(t => t.ThoiGian)
+            //     .ToListAsync();
+            var lichSu = await _chatMessageService.GetMessages(taiKhoan1, taiKhoan2);
+
 
             return Ok(lichSu);
         }

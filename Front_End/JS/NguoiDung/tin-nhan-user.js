@@ -240,12 +240,20 @@ async function loadMessages(user, expert) {
       return;
     }
 
+    // const list = document.getElementById("messageList");
+    // list.innerHTML = messages.map(msg => `
+    //   <div class="${msg.nguoiGuiId === user.taiKhoanId ? 'sent' : 'received'}">
+    //     <span>${msg.noiDung}</span>
+    //     <time>${new Date(msg.thoiGian).toLocaleTimeString()}</time>
+    //   </div>
+    // `).join("");
     const list = document.getElementById("messageList");
     list.innerHTML = messages.map(msg => `
-      <div class="${msg.nguoiGuiId === user.taiKhoanId ? 'sent' : 'received'}">
-        <span>${msg.noiDung}</span>
-        <time>${new Date(msg.thoiGian).toLocaleTimeString()}</time>
+      <div class="${msg.fromUserId === user.taiKhoanId ? 'sent' : 'received'}">
+        <span>${msg.content}</span>
+        <time>${new Date(msg.timestamp).toLocaleTimeString()}</time>
       </div>
+
     `).join("");
 
     list.scrollTop = list.scrollHeight;

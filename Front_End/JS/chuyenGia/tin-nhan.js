@@ -94,11 +94,17 @@ async function loadMessages(senderId, receiverId) {
 
     list.forEach(msg => {
       const li = document.createElement("li");
-      li.className = msg.nguoiGuiId === senderId ? "message-item me" : "message-item friend";
+      // li.className = msg.nguoiGuiId === senderId ? "message-item me" : "message-item friend";
+      // li.innerHTML = `
+      //   <p>${msg.noiDung}</p>
+      //   <span>${formatDate(msg.thoiGian)}</span>
+      // `;
+      li.className = msg.fromUserId === senderId ? "message-item me" : "message-item friend";
       li.innerHTML = `
-        <p>${msg.noiDung}</p>
-        <span>${formatDate(msg.thoiGian)}</span>
+        <p>${msg.content}</p>
+        <span>${formatDate(msg.timestamp)}</span>
       `;
+
       container.appendChild(li);
     });
 
