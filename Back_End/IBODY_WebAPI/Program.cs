@@ -5,6 +5,7 @@ using IBODY_WebAPI.Data;
 using IBODY_WebAPI.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileProviders;
+using IBODY_WebAPI.Services;
 
 
 
@@ -44,6 +45,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSingleton<ChatMessageService>();
+
 
 
 BadWordsFilter.Load("Configs/badwords.json");

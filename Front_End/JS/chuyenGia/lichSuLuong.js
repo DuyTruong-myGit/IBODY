@@ -67,3 +67,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("Không thể tải dữ liệu: " + err.message);
   }
 });
+
+function logout() {
+  localStorage.removeItem("user");
+  alert("Đăng xuất thành công!");
+  window.location.href = "../index.html";
+}

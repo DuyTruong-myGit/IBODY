@@ -20,6 +20,11 @@ window.addEventListener("DOMContentLoaded", async () => {
       sendMessage();
     }
   });
+
+  document.getElementById("sendButton").addEventListener("click", () => {
+  sendMessage();
+});
+
 });
 
 async function loadClients() {
@@ -141,3 +146,26 @@ function logout() {
   alert("Đăng xuất thành công!");
   window.location.href = "../index.html";
 }
+
+
+document.getElementById("toggleSidebarBtn").onclick = () => {
+      document.getElementById("sidebar").classList.toggle("collapsed");
+      document.getElementById("sidebar").classList.toggle("expanded");
+      document.getElementById("mainContent").classList.toggle("collapsed");
+      document.getElementById("mainContent").classList.toggle("expanded");
+    };
+
+    document.getElementById("toggleThemeBtn").onclick = () => {
+      document.body.classList.toggle("dark-mode");
+      document.getElementById("toggleThemeBtn").textContent =
+        document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+    };
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+  const keyword = this.value.toLowerCase();
+  const chatItems = document.querySelectorAll(".chat-item");
+  chatItems.forEach(item => {
+    const name = item.querySelector("h3").textContent.toLowerCase();
+    item.style.display = name.includes(keyword) ? "flex" : "none";
+  });
+});

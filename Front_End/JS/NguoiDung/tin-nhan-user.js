@@ -99,6 +99,7 @@
 //   }
 // }
 // =================== TÍCH HỢP MENU GIỐNG TRANG INDEX ===================
+
 document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const loginLink = document.getElementById("loginLink");
@@ -152,6 +153,7 @@ function logout() {
 
 // =================== CHỨC NĂNG CHAT ===================
 let selectedExpert = null;
+let refreshInterval = null;
 
 async function initChat() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -219,7 +221,14 @@ async function selectExpert(user, expert) {
   selectedExpert = expert;
   document.getElementById("expertName").innerText = expert.hoTen;
   await loadMessages(user, expert);
+
+  // Auto refresh mỗi 3 giây
+  if (refreshInterval) clearInterval(refreshInterval);
+  refreshInterval = setInterval(() => {
+    loadMessages(user, expert);
+  }, 3000);
 }
+
 
 async function loadMessages(user, expert) {
   try {

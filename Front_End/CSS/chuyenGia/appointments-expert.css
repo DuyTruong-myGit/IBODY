@@ -78,3 +78,47 @@ section {
     margin-bottom: 8px;
   }
 }
+
+
+
+.lich-item {
+  background: #f9f9fc;
+  border-left: 4px solid #3498db;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.dark-mode .lich-item {
+  background: #3a3a3a;
+  border-left-color: #888;
+}
+
+.lich-item h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.dark-mode .lich-item h4 {
+  color: #f0f0f0;
+}
+
+.btn-group {
+  margin-top: 10px;
+}
+
+.btn-group button {
+  background: #3498db;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  margin-right: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-group button:hover {
+  background: #2980b9;
+}

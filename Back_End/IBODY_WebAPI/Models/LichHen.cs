@@ -21,6 +21,8 @@ public partial class LichHen
 
     public string? TrangThai { get; set; }
 
+    public DateTime? NgayTao { get; set; }
+
     public virtual ChuyenGium? ChuyenGia { get; set; }
 
     public virtual ICollection<DanhGium> DanhGia { get; set; } = new List<DanhGium>();

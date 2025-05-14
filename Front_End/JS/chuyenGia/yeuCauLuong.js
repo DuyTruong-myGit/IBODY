@@ -36,9 +36,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.getElementById("guiYeuCauBtn").addEventListener("click", async () => {
-    if (data.tongCa === 0) {
-      return alert("Bạn chưa có buổi tư vấn nào hoàn tất.");
-    }
+    if (!data.chiTietCa || data.chiTietCa.length === 0) {
+    return alert("Không có ca tư vấn nào chưa được thanh toán.");
+  }
 
     const confirmSend = confirm("Xác nhận gửi yêu cầu nhận lương?");
     if (!confirmSend) return;
@@ -54,3 +54,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     location.reload();
   });
 });
+function logout() {
+  localStorage.removeItem("user");
+  alert("Đăng xuất thành công!");
+  window.location.href = "../index.html";
+}
+
+document.getElementById("toggleSidebarBtn").onclick = () => {
+      document.getElementById("sidebar").classList.toggle("collapsed");
+      document.getElementById("sidebar").classList.toggle("expanded");
+      document.getElementById("mainContent").classList.toggle("collapsed");
+      document.getElementById("mainContent").classList.toggle("expanded");
+    };
+    document.getElementById("toggleThemeBtn").onclick = () => {
+      document.body.classList.toggle("dark-mode");
+      document.getElementById("toggleThemeBtn").textContent =
+        document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+    };

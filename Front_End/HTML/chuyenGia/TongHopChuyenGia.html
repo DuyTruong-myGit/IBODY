@@ -5,108 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tổng hợp chuyên gia</title>
   <link rel="stylesheet" href="../../CSS/chuyenGia/TongHopChuyenGia.css">
-  <link rel="stylesheet" href="../../CSS/index.css">
 </head>
 <body>
-  <header class="header">
-    <div class="logo">
-      <span class="symbol">♂♀</span>
-      <span class="brand">ibody</span>
-    </div>
-    <nav class="nav">
-      <a href="indexChuyenGia.html" class="active">🏠 Trang chủ</a>
-      <a href="../chuyenGia/TongHopChuyenGia.html">📊 Quản lý thống kê</a>
-      <a href="../chuyenGia/appointments-expert.html">📅 Lịch hẹn</a>
-      <a href="../chuyenGia/clients-expert.html">👥 Khách hàng</a>
-      <a href="../chuyenGia/tin-nhan.html">💬 Tin nhắn</a>
-      <a href="../chuyenGia/profile.html">👤 Hồ sơ cá nhân</a>
-      <!-- <a href="../chuyenGia/settings-expert.html">⚙️ Cài đặt</a> -->
-      <a href="#" onclick="logout()">🚪 Đăng xuất</a>
-    </nav>
-  </header>
-
-  <!-- Phần 1: Thu nhập -->
-  <section class="income-section">
-    <h2>Thu nhập của tôi</h2>
-    <div class="income-summary">
-        <div class="total-clients-card" id="totalClientsCard">
-            <!-- Tổng khách hàng -->
-        </div>
-        <div class="completed-clients-card" id="completedClientsCard">
-            <!-- Khách hoàn thành -->
-        </div>
-        <div class="total-earnings-card" id="totalEarningsCard">
-          <!-- Tổng thu nhập -->
-        </div>
-    </div> 
-    <div class="transactions-section">
-      <h3>Giao dịch gần đây</h3>
-      <table class="transactions-table">
-        <thead>
-          <tr>
-            <th>Ngày thanh toán</th>
-            <th>Số tiền</th>
-            <th>Phương thức</th>
-          </tr>
-        </thead>
-        <tbody id="transactionList">
-          <!-- Giao dịch sẽ được load bằng JS -->
-        </tbody>
-      </table>
-    </div>
-    <div class="rating-card" id="ratingCard">
-      <!-- Điểm đánh giá sẽ được JS cập nhật -->
-    </div>
-  </section>
-
-
-
-  <!-- Phần 3: Danh sách khách hàng -->
-  <section class="clients-section">
-    <h2>Danh sách khách hàng</h2>
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên...">
-    </div>
-    <table class="clients-table">
-      <thead>
-        <tr>
-          <th>Tên khách hàng</th>
-          <th>Email</th>
-          <th>Số lần đặt lịch</th>
-          <th>Lần tư vấn gần nhất</th>
-        </tr>
-      </thead>
-      <tbody id="clientsList">
-        <!-- Danh sách khách sẽ được load bằng JS -->
-      </tbody>
-    </table>
-  </section>
-
+  <div class="topbar">
+  <div class="topbar-left">
+    <button id="toggleSidebarBtn" title="Ẩn/Hiện menu">☰</button>
+    <span class="topbar-title">IBODY – Thấu hiểu thân thể bạn</span>
+  </div>
+  <button id="toggleThemeBtn" title="Đổi giao diện">🌙</button>
 </div>
 
-
-<!-- footer -->
-<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-about">
-      <h3>Về chúng tôi</h3>
-      <p>
-          IBODY là một dự án nhằm kết nối học sinh với các chuyên gia tâm lý đáng tin cậy, hỗ trợ tư vấn những vấn đề tâm lý, sinh lý và tình dục mà các em còn ngần ngại chia sẻ với phụ huynh.
-          Chúng tôi mang đến không gian an toàn, thông tin chính xác và sự đồng hành chuyên nghiệp để giúp học sinh thấu hiểu bản thân, vượt qua lo lắng và phát triển một cách lành mạnh.
-      </p>
-    </div>
-    <div class="footer-contact">
-      <h4>Liên hệ</h4>
-      <p>Email: duytruongk22@gmail.com</p>
-      <p>Hotline: 0889 225 315</p>
-    </div>
+  <!-- SIDEBAR -->
+  <div class="sidebar expanded" id="sidebar">
+    <a href="indexChuyenGia.html">🏠 Trang chủ</a>
+    <a href="TongHopChuyenGia.html" class="active">📊 Quản lý thống kê</a>
+    <a href="appointments-expert.html">📅 Lịch hẹn</a>
+    <a href="clients-expert.html">👥 Khách hàng</a>
+    <a href="tin-nhan.html">💬 Tin nhắn</a>
+    <a href="profile.html">👤 Hồ sơ cá nhân</a>
+    <a href="yeuCauLuong.html">💰 Yêu cầu nhận lương</a>
+    <a href="lichSuLuong.html">💰 Lịch sử nhận lương</a>
+    <a href="#" onclick="logout()">🚪 Đăng xuất</a>
   </div>
-  <div class="footer-bottom">
-    <p>&copy; 2025 ibody. All rights reserved.</p>
+
+  <!-- MAIN CONTENT ĐÚNG -->
+  <div class="main-content expanded" id="mainContent">
+    <h1>Trang tổng quan chuyên gia</h1>
+
+  
+    <div class="section">
+      <h2>Thông tin cá nhân</h2>
+      <img id="expertAvatar" class="avatar" alt="avatar" />
+      <p><strong>Họ tên:</strong> <span id="expertName">Đang tải...</span></p>
+      <p><strong>Chuyên môn:</strong> <span id="expertSpecialty"></span></p>
+      <p><strong>Giới thiệu:</strong> <span id="expertIntro"></span></p>
+    </div>
+
+    <div class="section">
+      <h2>Thống kê thu nhập</h2>
+      <p><strong>Số ca đã hoàn tất:</strong> <span id="totalCa">0</span></p>
+      <p><strong>Đơn giá mỗi ca:</strong> <span id="donGia">0đ</span></p>
+      <p><strong>Tổng thu nhập:</strong> <span id="totalIncome">0đ</span></p>
+      <h3>Lịch sử nhận lương</h3>
+      <ul id="salaryHistory"><li>Đang tải...</li></ul>
+      <button id="withdrawRequestBtn">📤 Gửi yêu cầu rút lương</button>
+    </div>
+
+    <div class="section">
+      <h2>Lịch tư vấn sắp tới</h2>
+      <div id="upcomingSchedule"><p>Đang tải...</p></div>
+    </div>
+
+    <div class="section">
+      <h2>Đánh giá từ khách hàng</h2>
+      <p><strong>Trung bình:</strong> <span id="avgRating">0 / 5</span></p>
+      <div id="reviewList"><p>Đang tải...</p></div>
+    </div>
+
+    <div class="section">
+      <h2>Khách hàng đã tư vấn</h2>
+      <ul id="clientList"><li>Đang tải...</li></ul>
+    </div>
+
+    <div class="section">
+      <h2>Thời gian rảnh hiện tại</h2>
+      <ul id="freeTimeList"><li>Đang tải...</li></ul>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-about">
+          <h3>Về chúng tôi</h3>
+          <p>IBODY là một dự án nhằm kết nối học sinh với các chuyên gia tâm lý đáng tin cậy...</p>
+        </div>
+        <div class="footer-contact">
+          <h4>Liên hệ</h4>
+          <p>Email: duytruongk22@gmail.com</p>
+          <p>Hotline: 0889 225 315</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 ibody. All rights reserved.</p>
+      </div>
+    </footer>
   </div>
-</footer>
 
-
-<script src="../../JS/chuyenGia/TongHopChuyenGia.js"></script>
+  <script src="../../JS/chuyenGia/TongHopChuyenGia.js"></script>
 </body>
+
 </html>

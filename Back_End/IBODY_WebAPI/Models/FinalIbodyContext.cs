@@ -371,6 +371,9 @@ public partial class FinalIbodyContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ChuyenGiaId).HasColumnName("chuyen_gia_id");
             entity.Property(e => e.HinhThucId).HasColumnName("hinh_thuc_id");
+            entity.Property(e => e.NgayTao)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.NguoiDungId).HasColumnName("nguoi_dung_id");
             entity.Property(e => e.ThoiGianBatDau)
                 .HasColumnType("datetime")

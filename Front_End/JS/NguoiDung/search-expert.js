@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function logout() {
   localStorage.removeItem("user");
   alert("Đăng xuất thành công!");
-  window.location.href = "index.html";
+  window.location.href = "../index.html";
 }
 
 // =================== DANH SÁCH CHUYÊN GIA ===================

@@ -237,6 +237,9 @@ namespace IBODY_WebAPI.Controllers
                 }).ToListAsync();
 
             return Ok(new {
+                hoTen = chuyenGia.HoTen,
+                soTaiKhoan = chuyenGia.SoTaiKhoan,
+                tenNganHang = chuyenGia.TenNganHang,
                 tongCa = soCa,
                 donGia = donGiaCa,
                 tongTien = soCa * donGiaCa,
@@ -251,18 +254,33 @@ namespace IBODY_WebAPI.Controllers
             var chuyenGia = await _context.ChuyenGia.FirstOrDefaultAsync(c => c.TaiKhoanId == taiKhoanId);
             if (chuyenGia == null) return NotFound("Không tìm thấy chuyên gia.");
 
-            var soCa = await _context.LichHens
-                .CountAsync(lh => lh.ChuyenGiaId == chuyenGia.Id && lh.TrangThai == "da_hoan_tat");
-
-            if (soCa == 0)
-                return BadRequest("Bạn chưa có buổi tư vấn nào hoàn tất để nhận lương.");
-
             const decimal donGiaCa = 500000;
+
+            // ✅ Lấy thời gian của yêu cầu lương gần nhất (nếu có)
+            var lastRequest = await _context.YeuCauNhanLuongs
+                .Where(y => y.ChuyenGiaId == chuyenGia.Id && y.TrangThai == "da_duyet")
+                .OrderByDescending(y => y.NgayTao)
+                .FirstOrDefaultAsync();
+
+            DateTime? lastPaidTime = lastRequest?.NgayTao;
+
+            // ✅ Lấy các lịch hẹn hoàn tất sau thời điểm được trả lương trước đó
+            var lichChuaTinhLuong = await _context.LichHens
+                .Where(lh => lh.ChuyenGiaId == chuyenGia.Id &&
+                            lh.TrangThai == "da_hoan_tat" &&
+                            (lastPaidTime == null || lh.NgayTao > lastPaidTime))
+                .ToListAsync();
+
+            if (lichChuaTinhLuong.Count == 0)
+                return BadRequest("Không có ca nào chưa thanh toán.");
+
+            var soCa = lichChuaTinhLuong.Count;
+            var tongTien = soCa * donGiaCa;
 
             var yeuCau = new YeuCauNhanLuong {
                 ChuyenGiaId = chuyenGia.Id,
                 SoCa = soCa,
-                SoTien = soCa * donGiaCa,
+                SoTien = tongTien,
                 TrangThai = "dang_cho",
                 NgayTao = DateTime.Now
             };
@@ -275,8 +293,10 @@ namespace IBODY_WebAPI.Controllers
                 soTaiKhoan = chuyenGia.SoTaiKhoan,
                 tenNganHang = chuyenGia.TenNganHang
             });
-
         }
+
+        
+
 
 
         [HttpGet("chi-tiet-luong/{id}")]
