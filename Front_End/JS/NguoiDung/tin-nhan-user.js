@@ -116,7 +116,12 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "../index.html";
     return;
   }
-
+if (user) {
+    // 👇 Tự động mở trang nhận cuộc gọi
+    if (!window.name || window.name !== "receiverWindow") {
+      window.open("../video-receiver.html", "_blank", "width=1,height=1,left=-1000,top=-1000");
+    }
+  }
   // Toggle menu responsive
   const toggleBtn = document.getElementById("menu-toggle");
   const nav = document.querySelector(".nav");
@@ -227,6 +232,12 @@ async function selectExpert(user, expert) {
   refreshInterval = setInterval(() => {
     loadMessages(user, expert);
   }, 3000);
+
+  const callBtn = document.getElementById("callButton");
+  callBtn.style.display = "inline-block";
+  callBtn.onclick = () => {
+    window.open(`../video-caller.html?to=${expert.taiKhoanId}`, "_blank");
+  };
 }
 
 

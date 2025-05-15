@@ -11,6 +11,9 @@ các gói package cần cài (BEBE) :
     dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore
     # Cài thư viện mã hóa mật khẩu
     dotnet add package BCrypt.Net-Next
+    dotnet add package Microsoft.AspNetCore.SignalR.Core
+    mongo
+
 
 
 //Nếu chuyên gia đăng nhập với tài khoản bị khóa

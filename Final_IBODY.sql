@@ -231,7 +231,13 @@ CREATE TABLE YeuCauXacNhanGoiDichVu (
     NgayTao DATETIME DEFAULT GETDATE()
 );
 
+
+ALTER TABLE lich_hen
+ADD NgayTao DATETIME DEFAULT GETDATE();
+
+
 use Final_IBODY
+
 
 
 

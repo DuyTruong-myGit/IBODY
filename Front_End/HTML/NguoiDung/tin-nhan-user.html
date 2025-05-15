@@ -52,7 +52,10 @@
     </aside>
 
     <main class="chat-box">
-      <h3 id="expertName">Chọn chuyên gia để trò chuyện</h3>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h3 id="expertName">Chọn chuyên gia để trò chuyện</h3>
+        <button id="callButton" style="display: none; padding: 6px 12px; background: #007bff; color: white; border: none; border-radius: 5px;">📞 Gọi video</button>
+      </div>
       <div id="messageList" class="message-list"></div>
 
       <form id="messageForm">

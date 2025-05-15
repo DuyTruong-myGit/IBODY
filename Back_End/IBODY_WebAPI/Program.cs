@@ -6,6 +6,7 @@ using IBODY_WebAPI.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileProviders;
 using IBODY_WebAPI.Services;
+using Microsoft.AspNetCore.SignalR;
 
 
 
@@ -37,6 +38,19 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .WithOrigins("http://127.0.0.1:5500") // hoặc http://localhost:5500 nếu bạn dùng VS Code Live Server
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // BẮT BUỘC cho SignalR
+    });
+});
+
+
 
 // ✅ Add Controllers & JSON options
 builder.Services.AddControllers();
@@ -46,6 +60,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<ChatMessageService>();
+builder.Services.AddSignalR();
+
+builder.Services.AddSignalR()
+    .AddHubOptions<VideoCallHub>(options =>
+    {
+        options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+    });
+
+builder.Services.AddSingleton<IUserIdProvider, NameIdentifierUserIdProvider>();
+
+
 
 
 
@@ -75,10 +100,11 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/img"
 });
 
+app.MapHub<VideoCallHub>("/videoCallHub");
 
 // ✅ Use middleware
 app.UseCors("AllowAll");
-
+app.UseCors();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

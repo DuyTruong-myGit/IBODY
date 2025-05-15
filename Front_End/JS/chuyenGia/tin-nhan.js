@@ -8,6 +8,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   const localUser = JSON.parse(localStorage.getItem("user"));
   currentUserId = localUser.taiKhoanId;
   await loadClients();
+  if (!window.name || window.name !== "receiverWindow") {
+  window.open("../video-receiver.html", "_blank", "width=1,height=1,left=-1000,top=-1000");
+}
 
   document.getElementById("message-input").addEventListener("input", () => {
     const typingText = document.getElementById("typing-text");
@@ -74,6 +77,13 @@ async function loadClients() {
 
 function selectReceiver(id, element) {
   selectedUserId = id;
+  const callBtn = document.getElementById("callButton");
+callBtn.style.display = "inline-block";
+callBtn.onclick = () => {
+  window.open(`../video-caller.html?to=${id}`, "_blank");
+};
+
+
   document.querySelectorAll(".chat-item").forEach(item => item.classList.remove("active"));
   element.classList.add("active");
   loadMessages(currentUserId, selectedUserId);
